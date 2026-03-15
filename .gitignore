@@ -1,0 +1,33 @@
+# Environment files
+.env
+.env.local
+.env.production
+.env.secrets
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+
+# Claude
+.claude/
+
+# Node
+node_modules/
+dist/
+build/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Docker
+*.log
+
+# IDE
+.vscode/
+.idea/
