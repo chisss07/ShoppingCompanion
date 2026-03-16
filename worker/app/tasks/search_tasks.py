@@ -93,7 +93,7 @@ def _publish_event(
     logger.debug(
         "redis_event_published",
         channel=channel,
-        event=event_type,
+        event_type=event_type,
         sequence=sequence,
     )
 
