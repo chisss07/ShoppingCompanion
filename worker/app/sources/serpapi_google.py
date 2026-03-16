@@ -135,13 +135,12 @@ class GoogleShoppingAdapter(BaseSourceAdapter):
 
         listings: list[RawProductListing] = []
         for item in data.get("shopping_results", []):
-            url = item.get("link", "")
+            url = item.get("product_link") or item.get("link", "")
             if not url or url in seen_urls:
                 continue
             seen_urls.add(url)
 
-            price_raw = item.get("price", "")
-            price = _parse_price(str(price_raw))
+            price = item.get("extracted_price") or _parse_price(str(item.get("price", "")))
             if price is None:
                 continue
 
