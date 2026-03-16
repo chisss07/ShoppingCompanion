@@ -13,7 +13,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -165,12 +165,13 @@ async def list_history(
 @router.delete(
     "/{session_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Delete a single search history entry",
 )
 async def delete_history_entry(
     session_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-) -> None:
+) -> Response:
     """
     Soft-delete a single search session by setting deleted_at.
 
@@ -204,6 +205,7 @@ async def delete_history_entry(
     await db.commit()
 
     logger.info("history_entry_deleted", session_id=str(session_id))
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 # ---------------------------------------------------------------------------
@@ -213,11 +215,12 @@ async def delete_history_entry(
 @router.delete(
     "",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Clear all search history for this session",
 )
 async def delete_all_history(
     db: AsyncSession = Depends(get_db),
-) -> None:
+) -> Response:
     """
     Soft-delete all non-deleted search sessions associated with the current
     session token (anonymous) or user ID (authenticated).
@@ -244,3 +247,4 @@ async def delete_all_history(
     await db.commit()
 
     logger.info("history_cleared", sessions_soft_deleted=count)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
