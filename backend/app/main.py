@@ -172,30 +172,43 @@ def _run_migrations() -> None:
     """
     Programmatically run Alembic migrations to the 'head' revision.
 
-    This uses the synchronous Alembic API (not async) because Alembic's
-    migration runner itself is synchronous — it executes DDL statements
-    directly via the connection, which is fine for startup.
+    Uses the synchronous psycopg2 driver (Alembic doesn't support asyncpg
+    directly). Retries up to 5 times with 3-second gaps to tolerate the brief
+    window where postgres has passed its healthcheck but the TCP listener
+    isn't quite ready to accept application connections.
     """
+    import os
+    import time
+
     from alembic import command
     from alembic.config import Config
 
-    import os
-
-    # Locate alembic.ini relative to this file's location
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     alembic_ini = os.path.join(base_dir, "alembic.ini")
 
     alembic_cfg = Config(alembic_ini)
 
-    # Override the database URL from the environment so that the ini file
-    # does not need to contain the actual credentials.
-    # Convert async URL to sync for Alembic (Alembic doesn't support asyncpg directly)
     sync_url = settings.DATABASE_URL.replace(
         "postgresql+asyncpg://", "postgresql+psycopg2://"
     )
     alembic_cfg.set_main_option("sqlalchemy.url", sync_url)
 
-    command.upgrade(alembic_cfg, "head")
+    last_exc: Exception | None = None
+    for attempt in range(1, 6):
+        try:
+            command.upgrade(alembic_cfg, "head")
+            return
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            logger.warning(
+                "alembic_migrations_retry",
+                attempt=attempt,
+                error=str(exc),
+            )
+            if attempt < 5:
+                time.sleep(3)
+
+    raise last_exc  # type: ignore[misc]
 
 
 # ---------------------------------------------------------------------------
