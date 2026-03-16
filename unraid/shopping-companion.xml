@@ -30,11 +30,11 @@
   <!-- ── Data path ── -->
   <Config
     Name="AppData Path"
-    Target="APPDATA_PATH"
+    Target="/appdata"
     Default="/mnt/user/appdata/shopping-companion"
-    Mode=""
-    Description="Base folder on the Unraid host where all app data is stored. PostgreSQL files go in {path}/postgres and Redis files in {path}/redis. Change to /mnt/cache/appdata/shopping-companion to store on cache drive instead."
-    Type="Variable"
+    Mode="rw"
+    Description="Base folder on the Unraid host where all app data is stored. PostgreSQL files will be saved in a 'postgres' subfolder and Redis in a 'redis' subfolder. Change to /mnt/cache/appdata/shopping-companion to store on the cache drive."
+    Type="Path"
     Display="always"
     Required="true"
     Mask="false">/mnt/user/appdata/shopping-companion</Config>
