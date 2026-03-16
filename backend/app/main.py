@@ -64,15 +64,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         debug=settings.DEBUG,
     )
 
-    # Run Alembic migrations so the database schema is always up to date
-    # before the first request is served.  This is safe to run on every
-    # startup because Alembic is idempotent (skips already-applied migrations).
+    # Create all tables that don't yet exist.
+    # Uses the async asyncpg engine — no psycopg2 needed, no event-loop conflict.
+    # create_all() is idempotent: it skips tables that already exist.
     try:
-        _run_migrations()
-        logger.info("alembic_migrations_complete")
+        from app.db.base import Base
+        import app.models.search  # noqa: F401 — register models before create_all
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("database_schema_ready")
     except Exception as exc:  # pylint: disable=broad-except
-        logger.error("alembic_migrations_failed", error=str(exc))
-        # In production we raise to prevent a broken app from serving traffic.
+        logger.error("database_schema_failed", error=str(exc))
         if settings.is_production:
             raise
 
@@ -162,53 +164,6 @@ def create_app() -> FastAPI:
     app.include_router(api_v1_router, prefix="/api/v1")
 
     return app
-
-
-# ---------------------------------------------------------------------------
-# Alembic migration runner
-# ---------------------------------------------------------------------------
-
-def _run_migrations() -> None:
-    """
-    Programmatically run Alembic migrations to the 'head' revision.
-
-    Uses the synchronous psycopg2 driver (Alembic doesn't support asyncpg
-    directly). Retries up to 5 times with 3-second gaps to tolerate the brief
-    window where postgres has passed its healthcheck but the TCP listener
-    isn't quite ready to accept application connections.
-    """
-    import os
-    import time
-
-    from alembic import command
-    from alembic.config import Config
-
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    alembic_ini = os.path.join(base_dir, "alembic.ini")
-
-    alembic_cfg = Config(alembic_ini)
-
-    sync_url = settings.DATABASE_URL.replace(
-        "postgresql+asyncpg://", "postgresql+psycopg2://"
-    )
-    alembic_cfg.set_main_option("sqlalchemy.url", sync_url)
-
-    last_exc: Exception | None = None
-    for attempt in range(1, 6):
-        try:
-            command.upgrade(alembic_cfg, "head")
-            return
-        except Exception as exc:  # noqa: BLE001
-            last_exc = exc
-            logger.warning(
-                "alembic_migrations_retry",
-                attempt=attempt,
-                error=str(exc),
-            )
-            if attempt < 5:
-                time.sleep(3)
-
-    raise last_exc  # type: ignore[misc]
 
 
 # ---------------------------------------------------------------------------
