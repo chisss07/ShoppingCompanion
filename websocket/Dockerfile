@@ -4,7 +4,7 @@
 # ============================================================
 
 # ── Stage 1: Builder ────────────────────────────────────────
-FROM python:3.13-slim-bookworm AS builder
+FROM python:3.12-slim-bookworm AS builder
 
 WORKDIR /build
 
@@ -23,7 +23,7 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # ── Stage 2: Runtime ────────────────────────────────────────
-FROM python:3.13-slim-bookworm AS runtime
+FROM python:3.12-slim-bookworm AS runtime
 
 # curl is needed for the Docker/Compose health check probe
 RUN apt-get update && apt-get install -y --no-install-recommends \
