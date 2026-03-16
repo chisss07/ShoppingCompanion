@@ -41,10 +41,28 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     SECRET_KEY: str = "change-me-to-a-random-64-char-string"
 
-    # ── Database ─────────────────────────────────────────────────────────────
-    DATABASE_URL: str = (
-        "postgresql+asyncpg://shopping:changeme@localhost:5432/shoppingcompanion"
-    )
+    # ── Database — individual components so special chars in passwords work ──
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_USER: str = "shopping"
+    POSTGRES_PASSWORD: str = "changeme"
+    POSTGRES_DB: str = "shoppingcompanion"
+
+    @property
+    def DATABASE_URL(self) -> str:  # noqa: N802
+        """Build the asyncpg URL using URL.create() so the password is
+        properly percent-encoded regardless of what characters it contains."""
+        from sqlalchemy.engine import URL
+        return str(
+            URL.create(
+                "postgresql+asyncpg",
+                username=self.POSTGRES_USER,
+                password=self.POSTGRES_PASSWORD,
+                host=self.POSTGRES_HOST,
+                port=self.POSTGRES_PORT,
+                database=self.POSTGRES_DB,
+            )
+        )
 
     # ── Redis ────────────────────────────────────────────────────────────────
     REDIS_URL: str = "redis://localhost:6379/0"
