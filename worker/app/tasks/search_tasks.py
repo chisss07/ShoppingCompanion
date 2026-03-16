@@ -126,10 +126,11 @@ async def _save_results(
 
     from sqlalchemy import update
 
-    from app.db.models import AlternativeProduct, ProductListing, SearchSession
+    from app.db.models import AlternativeProduct, SearchResult, SearchSession, SearchSummary
     from app.db.session import get_async_session
 
     session_uuid = _uuid.UUID(session_id)
+    source_names = {listing.get("source_name") for listing in ranked_listings if listing.get("source_name")}
 
     async with get_async_session() as db:
         # Update the session record
@@ -139,21 +140,22 @@ async def _save_results(
             .values(
                 status="complete",
                 parsed_query=parsed_query,
-                summary=summary,
-                updated_at=datetime.now(timezone.utc),
+                result_count=len(ranked_listings),
+                total_sources_queried=len(source_names),
+                completed_at=datetime.now(timezone.utc),
             )
         )
 
-        # Insert product listings
+        # Insert search results
         for listing in ranked_listings:
             db.add(
-                ProductListing(
+                SearchResult(
                     session_id=session_uuid,
                     source_name=listing.get("source_name", ""),
                     product_title=listing.get("product_title", ""),
-                    price=float(listing.get("price", 0)),
+                    price=listing.get("price", 0),
                     currency=listing.get("currency", "USD"),
-                    url=listing.get("url", ""),
+                    product_url=listing.get("url") or listing.get("product_url", ""),
                     availability=listing.get("availability", "in_stock"),
                     seller_name=listing.get("seller_name"),
                     seller_rating=listing.get("seller_rating"),
@@ -174,12 +176,28 @@ async def _save_results(
                 AlternativeProduct(
                     session_id=session_uuid,
                     product_name=alt.get("product_name", ""),
+                    model_number=alt.get("model_number"),
                     model_relationship=alt.get("model_relationship", "competitor"),
                     comparison_summary=alt.get("comparison_summary", ""),
                     key_differences=alt.get("key_differences", []),
                     price_min=alt.get("price_min"),
                     price_max=alt.get("price_max"),
                     recommendation_strength=alt.get("recommendation_strength", "moderate"),
+                    source_urls=alt.get("source_urls", []),
+                )
+            )
+
+        # Insert summary into separate table
+        if summary:
+            db.add(
+                SearchSummary(
+                    session_id=session_uuid,
+                    top_pick_summary=summary.get("top_pick_summary", ""),
+                    comparison_table_data=summary.get("comparison_table_data") or {},
+                    alternatives_brief=summary.get("alternatives_brief"),
+                    caveats=summary.get("caveats"),
+                    model_version=summary.get("model_version", ""),
+                    token_usage=summary.get("token_usage") or {},
                 )
             )
 
@@ -205,9 +223,8 @@ async def _mark_session_error(session_id: str, error_message: str) -> None:
                 update(SearchSession)
                 .where(SearchSession.id == _uuid.UUID(session_id))
                 .values(
-                    status="error",
-                    error_message=error_message,
-                    updated_at=datetime.now(timezone.utc),
+                    status="failed",
+                    completed_at=datetime.now(timezone.utc),
                 )
             )
     except Exception as db_exc:
