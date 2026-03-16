@@ -133,8 +133,6 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   },
 
   setWSEvent: (event: WSEvent) => {
-    const state = get();
-
     switch (event.event) {
       case 'search:started': {
         const data = event.data as unknown as WSStartedData;

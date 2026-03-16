@@ -175,7 +175,6 @@ export function ComparisonCard({ entry, isBestDeal = false }: ComparisonCardProp
         {/* CTA */}
         <div className="mt-auto pt-1">
           <Button
-            as="a"
             variant={isBestDeal ? 'primary' : 'secondary'}
             size="sm"
             fullWidth

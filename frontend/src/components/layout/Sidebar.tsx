@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { History, Trash2, ChevronRight, ShoppingBag, X, Clock } from 'lucide-react';
+import { History, Trash2, ChevronRight, ShoppingBag, Clock } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useSearchStore } from '../../store/searchStore';
 import { formatPrice } from '../../services/api';

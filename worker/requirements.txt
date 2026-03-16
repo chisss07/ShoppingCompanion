@@ -6,7 +6,7 @@
 # Task queue
 celery==5.4.0
 gevent==24.11.1
-redbeat==2.2.0
+celery-redbeat==2.3.3
 
 # Cache and broker
 redis==5.2.0
