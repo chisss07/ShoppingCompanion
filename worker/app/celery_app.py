@@ -24,7 +24,6 @@ app = Celery(
     backend=settings.CELERY_RESULT_BACKEND,
     include=[
         "app.tasks.search_tasks",
-        "app.tasks.maintenance_tasks",
     ],
 )
 
@@ -39,7 +38,6 @@ app.conf.update(
     # Routing: all search tasks go to the dedicated "search" queue
     task_routes={
         "app.tasks.search_tasks.*": {"queue": "search"},
-        "app.tasks.maintenance_tasks.*": {"queue": "default"},
     },
     # Time limits: hard-kill at 120 s, raise SoftTimeLimitExceeded at 90 s
     task_time_limit=120,
@@ -51,18 +49,7 @@ app.conf.update(
     # Reject (re-queue) on worker power loss, not on task exception
     task_reject_on_worker_lost=True,
     # Beat schedule (used when running celery beat)
-    beat_schedule={
-        "check-source-health-every-5-minutes": {
-            "task": "app.tasks.maintenance_tasks.check_source_health",
-            "schedule": 300,  # seconds
-            "options": {"queue": "default"},
-        },
-        "clean-old-sessions-daily": {
-            "task": "app.tasks.maintenance_tasks.clean_old_sessions",
-            "schedule": 86400,  # seconds
-            "options": {"queue": "default"},
-        },
-    },
+    beat_schedule={},
     # RedBeat scheduler storage key prefix
     redbeat_redis_url=settings.REDIS_URL,
     redbeat_key_prefix="redbeat:",

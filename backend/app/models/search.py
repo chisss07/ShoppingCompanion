@@ -154,8 +154,15 @@ class SearchSession(Base):
     # Self-referential: child sessions link back to their parent
     child_sessions: Mapped[list[SearchSession]] = relationship(
         "SearchSession",
-        foreign_keys=[parent_session_id],
-        backref="parent_session",
+        foreign_keys="[SearchSession.parent_session_id]",
+        back_populates="parent_session",
+        lazy="select",
+    )
+    parent_session: Mapped[Optional[SearchSession]] = relationship(
+        "SearchSession",
+        foreign_keys="[SearchSession.parent_session_id]",
+        remote_side="SearchSession.id",
+        back_populates="child_sessions",
         lazy="select",
     )
 
