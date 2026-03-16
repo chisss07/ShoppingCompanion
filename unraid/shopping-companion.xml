@@ -6,275 +6,258 @@
   <Network>shopping-companion</Network>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
-  <Overview>
-    AI-powered shopping assistant that compares prices across Amazon, Best Buy, Walmart,
-    eBay, and more — with real-time WebSocket progress and Claude AI summaries.
-    Uses Docker Compose Manager. See: https://github.com/chisss07/ShoppingCompanion
-  </Overview>
+  <Overview>AI-powered shopping assistant that compares prices across Amazon, Best Buy, Walmart, eBay, and more — with real-time progress and Claude AI summaries. Requires Docker Compose Manager plugin.</Overview>
   <Category>Tools:</Category>
-  <WebUI>http://[IP]:[PORT:80]/</WebUI>
+  <WebUI>http://[IP]:[PORT:8090]/</WebUI>
   <Icon>https://raw.githubusercontent.com/chisss07/ShoppingCompanion/main/docs/icon.png</Icon>
-  <Description>
-    AI-powered shopping price comparison tool. Searches major retailers in parallel,
-    ranks results by deal score, and provides Claude AI-generated summaries and
-    alternative model recommendations. Real-time progress via WebSocket.
-    Requires Docker Compose Manager plugin.
-  </Description>
+  <Description>AI-powered shopping price comparison. Searches major retailers in parallel, ranks by deal score, and provides Claude AI summaries and alternative model recommendations. Use with Docker Compose Manager and the compose file at https://github.com/chisss07/ShoppingCompanion/blob/main/unraid/docker-compose.yml</Description>
   <Project>https://github.com/chisss07/ShoppingCompanion</Project>
+  <DonateText/>
+  <DonateLink/>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       PORTS
-  ═══════════════════════════════════════════════════════════ -->
-  <Networking>
-    <Mode>bridge</Mode>
-    <Publish>
-      <Port>
-        <HostPort>8090</HostPort>
-        <ContainerPort>80</ContainerPort>
-        <Protocol>tcp</Protocol>
-        <Description>Web UI (nginx frontend)</Description>
-      </Port>
-    </Publish>
-  </Networking>
+  <!-- ── Web UI port ── -->
+  <Config
+    Name="Web UI Port"
+    Target="8090"
+    Default="8090"
+    Mode="tcp"
+    Description="Port to access the Shopping Companion web UI"
+    Type="Port"
+    Display="always"
+    Required="true"
+    Mask="false">8090</Config>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       VOLUMES
-  ═══════════════════════════════════════════════════════════ -->
-  <Data>
-    <Volume>
-      <HostDir>/mnt/user/appdata/shopping-companion/postgres</HostDir>
-      <ContainerDir>/var/lib/postgresql/data</ContainerDir>
-      <Mode>rw</Mode>
-      <Mask>755</Mask>
-      <Name>postgres-data</Name>
-      <Description>PostgreSQL database files</Description>
-    </Volume>
-    <Volume>
-      <HostDir>/mnt/user/appdata/shopping-companion/redis</HostDir>
-      <ContainerDir>/data</ContainerDir>
-      <Mode>rw</Mode>
-      <Mask>755</Mask>
-      <Name>redis-data</Name>
-      <Description>Redis persistence data</Description>
-    </Volume>
-  </Data>
+  <!-- ── Data paths ── -->
+  <Config
+    Name="PostgreSQL Data Path"
+    Target="/var/lib/postgresql/data"
+    Default="/mnt/user/appdata/shopping-companion/postgres"
+    Mode="rw"
+    Description="Where PostgreSQL stores its database files on the Unraid host"
+    Type="Path"
+    Display="always"
+    Required="true"
+    Mask="false">/mnt/user/appdata/shopping-companion/postgres</Config>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       ENVIRONMENT VARIABLES
-  ═══════════════════════════════════════════════════════════ -->
+  <Config
+    Name="Redis Data Path"
+    Target="/data"
+    Default="/mnt/user/appdata/shopping-companion/redis"
+    Mode="rw"
+    Description="Where Redis stores its persistence files on the Unraid host"
+    Type="Path"
+    Display="always"
+    Required="true"
+    Mask="false">/mnt/user/appdata/shopping-companion/redis</Config>
 
-  <!-- ── App ── -->
-  <Environment>
-    <Variable>
-      <Value>production</Value>
-      <Name>APP_ENV</Name>
-      <Mode/>
-      <Description>Application environment (production / development)</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>false</Mask>
-    </Variable>
+  <!-- ═══════════════════════════════════════════
+       REQUIRED — must be filled in before starting
+  ═══════════════════════════════════════════ -->
 
-    <Variable>
-      <Value></Value>
-      <Name>SECRET_KEY</Name>
-      <Mode/>
-      <Description>Random 64-character secret key. Generate with: openssl rand -hex 32</Description>
-      <Display>always</Display>
-      <Required>true</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="Anthropic API Key"
+    Target="ANTHROPIC_API_KEY"
+    Default=""
+    Mode=""
+    Description="Required. Your Anthropic Claude API key — get one at console.anthropic.com. Powers AI summaries and alternative model detection."
+    Type="Variable"
+    Display="always"
+    Required="true"
+    Mask="true"></Config>
 
-    <!-- ── Database ── -->
-    <Variable>
-      <Value>shopping</Value>
-      <Name>POSTGRES_USER</Name>
-      <Mode/>
-      <Description>PostgreSQL username</Description>
-      <Display>always</Display>
-      <Required>true</Required>
-      <Mask>false</Mask>
-    </Variable>
+  <Config
+    Name="PostgreSQL Password"
+    Target="POSTGRES_PASSWORD"
+    Default=""
+    Mode=""
+    Description="Required. Password for the PostgreSQL database. Choose something strong — used internally only."
+    Type="Variable"
+    Display="always"
+    Required="true"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>POSTGRES_PASSWORD</Name>
-      <Mode/>
-      <Description>PostgreSQL password — choose a strong password</Description>
-      <Display>always</Display>
-      <Required>true</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="Secret Key"
+    Target="SECRET_KEY"
+    Default=""
+    Mode=""
+    Description="Required. Random 64-char secret for signing tokens. Generate with: openssl rand -hex 32"
+    Type="Variable"
+    Display="always"
+    Required="true"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value>shoppingcompanion</Value>
-      <Name>POSTGRES_DB</Name>
-      <Mode/>
-      <Description>PostgreSQL database name</Description>
-      <Display>advanced</Display>
-      <Required>true</Required>
-      <Mask>false</Mask>
-    </Variable>
+  <!-- ═══════════════════════════════════════════
+       SHOPPING APIs — optional, leave blank to use mock data
+  ═══════════════════════════════════════════ -->
 
-    <!-- ── AI ── -->
-    <Variable>
-      <Value></Value>
-      <Name>ANTHROPIC_API_KEY</Name>
-      <Mode/>
-      <Description>Anthropic Claude API key — get one at console.anthropic.com. Required for AI summaries and alternative model detection.</Description>
-      <Display>always</Display>
-      <Required>true</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="Best Buy API Key"
+    Target="BESTBUY_API_KEY"
+    Default=""
+    Mode=""
+    Description="Optional. Best Buy Products API key — developer.bestbuy.com"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
 
-    <!-- ── Shopping APIs ── -->
-    <Variable>
-      <Value></Value>
-      <Name>BESTBUY_API_KEY</Name>
-      <Mode/>
-      <Description>Best Buy Products API key — developer.bestbuy.com</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="SerpAPI Key (Google Shopping)"
+    Target="SERPAPI_KEY"
+    Default=""
+    Mode=""
+    Description="Optional. SerpAPI key for Google Shopping results — serpapi.com"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>SERPAPI_KEY</Name>
-      <Mode/>
-      <Description>SerpAPI key (Google Shopping results) — serpapi.com</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="eBay App ID"
+    Target="EBAY_APP_ID"
+    Default=""
+    Mode=""
+    Description="Optional. eBay Browse API App ID — developer.ebay.com"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>EBAY_APP_ID</Name>
-      <Mode/>
-      <Description>eBay Browse API App ID — developer.ebay.com</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="eBay Cert ID"
+    Target="EBAY_CERT_ID"
+    Default=""
+    Mode=""
+    Description="Optional. eBay Browse API Cert ID"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>EBAY_CERT_ID</Name>
-      <Mode/>
-      <Description>eBay Browse API Cert ID</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="eBay OAuth Token"
+    Target="EBAY_OAUTH_TOKEN"
+    Default=""
+    Mode=""
+    Description="Optional. eBay OAuth Client Credentials token"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>EBAY_OAUTH_TOKEN</Name>
-      <Mode/>
-      <Description>eBay OAuth Client Credentials token</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="Amazon Access Key"
+    Target="AMAZON_ACCESS_KEY"
+    Default=""
+    Mode=""
+    Description="Optional. Amazon Product Advertising API 5.0 Access Key"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>AMAZON_ACCESS_KEY</Name>
-      <Mode/>
-      <Description>Amazon Product Advertising API 5.0 Access Key</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="Amazon Secret Key"
+    Target="AMAZON_SECRET_KEY"
+    Default=""
+    Mode=""
+    Description="Optional. Amazon Product Advertising API 5.0 Secret Key"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>AMAZON_SECRET_KEY</Name>
-      <Mode/>
-      <Description>Amazon Product Advertising API 5.0 Secret Key</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="Amazon Partner Tag"
+    Target="AMAZON_PARTNER_TAG"
+    Default=""
+    Mode=""
+    Description="Optional. Amazon Associates Partner Tag (e.g. mysite-20)"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="false"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>AMAZON_PARTNER_TAG</Name>
-      <Mode/>
-      <Description>Amazon Associates Partner Tag (e.g. mysite-20)</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>false</Mask>
-    </Variable>
+  <Config
+    Name="Walmart Consumer ID"
+    Target="WALMART_CONSUMER_ID"
+    Default=""
+    Mode=""
+    Description="Optional. Walmart Open API Consumer ID — developer.walmart.com"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>WALMART_CONSUMER_ID</Name>
-      <Mode/>
-      <Description>Walmart Open API Consumer ID — developer.walmart.com</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <Config
+    Name="Walmart Private Key"
+    Target="WALMART_PRIVATE_KEY"
+    Default=""
+    Mode=""
+    Description="Optional. Walmart Open API Private Key (RSA, base64-encoded)"
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
 
-    <Variable>
-      <Value></Value>
-      <Name>WALMART_PRIVATE_KEY</Name>
-      <Mode/>
-      <Description>Walmart Open API Private Key (RSA, base64-encoded)</Description>
-      <Display>always</Display>
-      <Required>false</Required>
-      <Mask>true</Mask>
-    </Variable>
+  <!-- ═══════════════════════════════════════════
+       ADVANCED — safe to leave as defaults
+  ═══════════════════════════════════════════ -->
 
-    <!-- ── Rate Limiting ── -->
-    <Variable>
-      <Value>10</Value>
-      <Name>SEARCH_RATE_LIMIT_PER_MINUTE</Name>
-      <Mode/>
-      <Description>Max searches per minute per IP</Description>
-      <Display>advanced</Display>
-      <Required>false</Required>
-      <Mask>false</Mask>
-    </Variable>
+  <Config
+    Name="PostgreSQL User"
+    Target="POSTGRES_USER"
+    Default="shopping"
+    Mode=""
+    Description="PostgreSQL username (internal)"
+    Type="Variable"
+    Display="advanced"
+    Required="true"
+    Mask="false">shopping</Config>
 
-    <Variable>
-      <Value>200</Value>
-      <Name>SEARCH_RATE_LIMIT_PER_DAY</Name>
-      <Mode/>
-      <Description>Max searches per day per IP</Description>
-      <Display>advanced</Display>
-      <Required>false</Required>
-      <Mask>false</Mask>
-    </Variable>
+  <Config
+    Name="PostgreSQL Database"
+    Target="POSTGRES_DB"
+    Default="shoppingcompanion"
+    Mode=""
+    Description="PostgreSQL database name (internal)"
+    Type="Variable"
+    Display="advanced"
+    Required="true"
+    Mask="false">shoppingcompanion</Config>
 
-    <!-- ── Internal (pre-filled, no need to change) ── -->
-    <Variable>
-      <Value>postgres</Value>
-      <Name>POSTGRES_HOST</Name>
-      <Mode/>
-      <Description>Internal PostgreSQL hostname (do not change)</Description>
-      <Display>advanced</Display>
-      <Required>true</Required>
-      <Mask>false</Mask>
-    </Variable>
+  <Config
+    Name="Searches Per Minute (rate limit)"
+    Target="SEARCH_RATE_LIMIT_PER_MINUTE"
+    Default="10"
+    Mode=""
+    Description="Max searches per minute per IP address"
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false">10</Config>
 
-    <Variable>
-      <Value>redis</Value>
-      <Name>REDIS_HOST</Name>
-      <Mode/>
-      <Description>Internal Redis hostname (do not change)</Description>
-      <Display>advanced</Display>
-      <Required>true</Required>
-      <Mask>false</Mask>
-    </Variable>
+  <Config
+    Name="Searches Per Day (rate limit)"
+    Target="SEARCH_RATE_LIMIT_PER_DAY"
+    Default="200"
+    Mode=""
+    Description="Max searches per day per IP address"
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false">200</Config>
 
-  </Environment>
-
-  <Labels/>
-  <Config Name="Web UI Port" Target="80" Default="8090" Mode="tcp" Description="Port to access the Shopping Companion web UI" Type="Port" Display="always" Required="true" Mask="false">8090</Config>
-  <Config Name="AppData - PostgreSQL" Target="/var/lib/postgresql/data" Default="/mnt/user/appdata/shopping-companion/postgres" Mode="rw" Description="PostgreSQL data directory" Type="Path" Display="advanced" Required="true" Mask="false">/mnt/user/appdata/shopping-companion/postgres</Config>
-  <Config Name="AppData - Redis" Target="/data" Default="/mnt/user/appdata/shopping-companion/redis" Mode="rw" Description="Redis persistence directory" Type="Path" Display="advanced" Required="true" Mask="false">/mnt/user/appdata/shopping-companion/redis</Config>
+  <Config
+    Name="Log Level"
+    Target="LOG_LEVEL"
+    Default="info"
+    Mode=""
+    Description="Logging verbosity: debug, info, warning, error"
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false">info</Config>
 
 </Container>
