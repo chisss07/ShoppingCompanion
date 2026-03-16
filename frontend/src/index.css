@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────
+   Design Tokens as CSS Custom Properties
+   ───────────────────────────────────────────── */
+:root {
+  /* Brand colors */
+  --color-primary-50: #F7F8FE;
+  --color-primary-100: #EEF0FD;
+  --color-primary-400: #8FA0F6;
+  --color-primary-500: #6B7FEF;
+  --color-primary-600: #4059D9;
+  --color-primary-700: #3645AE;
+  --color-primary-800: #283080;
+  --color-primary-900: #1A1F52;
+
+  /* Semantic colors */
+  --color-success: #28A062;
+  --color-warning: #F5A000;
+  --color-danger: #D93535;
+
+  /* Surface */
+  --color-bg: #F9F9FB;
+  --color-card: #ffffff;
+  --color-border: #E2E4E9;
+  --color-border-strong: #CDD0D9;
+
+  /* Typography */
+  --color-text-primary: #111827;
+  --color-text-secondary: #4B5563;
+  --color-text-tertiary: #9EA3B0;
+
+  /* Radius */
+  --radius-card: 12px;
+  --radius-badge: 6px;
+  --radius-button: 8px;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-card-hover: 0 4px 12px 0 rgb(0 0 0 / 0.08), 0 2px 4px -1px rgb(0 0 0 / 0.05);
+}
+
+/* ─────────────────────────────────────────────
+   Base / Reset
+   ───────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900 font-sans;
+    min-height: 100dvh;
+    margin: 0;
+  }
+
+  #root {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Focus visible — accessible ring */
+  :focus-visible {
+    @apply outline-2 outline-primary-600 outline-offset-2;
+  }
+
+  /* Remove focus ring for mouse interactions */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-100;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-400;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Component Utilities
+   ───────────────────────────────────────────── */
+@layer components {
+  .card {
+    @apply bg-white border border-neutral-200 rounded-card shadow-card;
+  }
+
+  .card-hover {
+    @apply transition-shadow duration-200 hover:shadow-card-hover;
+  }
+
+  .price-text {
+    @apply font-mono font-medium tabular-nums;
+  }
+
+  /* Progress bar fill animation */
+  .progress-fill {
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Source step connector line */
+  .step-connector {
+    @apply h-0.5 flex-1 bg-neutral-200;
+    transition: background-color 0.3s ease;
+  }
+
+  .step-connector.complete {
+    @apply bg-success-500;
+  }
+
+  /* Gradient badge for AI */
+  .badge-ai {
+    background: linear-gradient(135deg, #4059D9 0%, #6B7FEF 100%);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Utility Overrides
+   ───────────────────────────────────────────── */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .animate-pulse-dot {
+    animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+}

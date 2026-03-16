@@ -1,0 +1,76 @@
+name: shoppingcompanion
+
+# Development overrides - use with:
+# docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+
+  nginx:
+    ports:
+      - "80:80"
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost/api/v1
+      - VITE_WS_URL=ws://localhost/ws
+    command: npm run dev -- --host
+
+  backend:
+    volumes:
+      - ./backend/app:/app/app
+    ports:
+      - "8000:8000"
+      - "5678:5678"  # debugpy
+    environment:
+      - APP_ENV=development
+      - DEBUG=true
+      - LOG_LEVEL=debug
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    deploy:
+      resources:
+        limits: {}
+
+  websocket:
+    volumes:
+      - ./websocket/app:/app/app
+    ports:
+      - "8001:8001"
+    environment:
+      - DEBUG=true
+    deploy:
+      resources:
+        limits: {}
+
+  worker:
+    volumes:
+      - ./worker/app:/app/app
+    ports:
+      - "5679:5679"  # debugpy
+    environment:
+      - APP_ENV=development
+    command: celery -A app.celery_app worker --loglevel=debug --concurrency=2 --pool=gevent -Q search,default
+    deploy:
+      resources:
+        limits: {}
+
+  postgres:
+    ports:
+      - "5432:5432"
+    deploy:
+      resources:
+        limits: {}
+
+  redis:
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits: {}

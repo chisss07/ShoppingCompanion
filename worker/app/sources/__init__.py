@@ -1,0 +1,1 @@
+# Shopping source adapters

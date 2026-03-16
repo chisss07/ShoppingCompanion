@@ -1,0 +1,35 @@
+# ============================================================
+# Shopping Companion - Celery Worker Dependencies
+# All versions pinned for reproducible builds
+# ============================================================
+
+# Task queue
+celery==5.4.0
+gevent==24.11.1
+redbeat==2.2.0
+
+# Cache and broker
+redis==5.2.0
+
+# Database (async SQLAlchemy + asyncpg driver)
+sqlalchemy==2.0.36
+asyncpg==0.30.0
+
+# HTTP client (async)
+httpx==0.28.0
+
+# HTML parsing (for scraper fallbacks)
+beautifulsoup4==4.12.3
+
+# AI
+anthropic==0.40.0
+
+# Validation and settings
+pydantic==2.9.2
+pydantic-settings==2.6.0
+
+# Structured logging
+structlog==24.4.0
+
+# Retry logic
+tenacity==9.0.0
