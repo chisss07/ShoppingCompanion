@@ -6,11 +6,11 @@
   <Network>shopping-companion</Network>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
-  <Overview>AI-powered shopping assistant that compares prices across Amazon, Best Buy, Walmart, eBay, and more — with real-time progress and Claude AI summaries. Requires Docker Compose Manager plugin.</Overview>
+  <Overview>⚠️ REFERENCE ONLY — This template documents the available settings. To run the full app (frontend + backend + worker + database) use Docker Compose Manager plugin with the compose file at: https://raw.githubusercontent.com/chisss07/ShoppingCompanion/main/unraid/docker-compose.yml — Add Stack → paste that URL → fill in the fields → Compose Up.</Overview>
   <Category>Tools:</Category>
   <WebUI>http://[IP]:[PORT:8090]/</WebUI>
   <Icon>https://raw.githubusercontent.com/chisss07/ShoppingCompanion/main/docs/icon.png</Icon>
-  <Description>AI-powered shopping price comparison. Searches major retailers in parallel, ranks by deal score, and provides Claude AI summaries and alternative model recommendations. Use with Docker Compose Manager and the compose file at https://github.com/chisss07/ShoppingCompanion/blob/main/unraid/docker-compose.yml</Description>
+  <Description>AI-powered shopping price comparison across Amazon, Best Buy, eBay, and more with Claude AI summaries. IMPORTANT: This app requires 6 containers (frontend, backend, worker, websocket, postgres, redis). Do NOT start this template directly — it will only run the frontend and searches will fail. Instead: install Docker Compose Manager from Community Apps, click Add Stack, paste https://raw.githubusercontent.com/chisss07/ShoppingCompanion/main/unraid/docker-compose.yml as the compose URL, fill in your API keys in the form, and click Compose Up.</Description>
   <Project>https://github.com/chisss07/ShoppingCompanion</Project>
   <DonateText/>
   <DonateLink/>
