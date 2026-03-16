@@ -56,7 +56,6 @@ def _configure_logging(log_level: str, is_production: bool) -> None:
 
     shared_processors = [
         sl.contextvars.merge_contextvars,
-        sl.stdlib.add_logger_name,
         sl.stdlib.add_log_level,
         sl.stdlib.PositionalArgumentsFormatter(),
         sl.processors.TimeStamper(fmt="iso"),
