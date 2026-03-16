@@ -27,28 +27,17 @@
     Required="true"
     Mask="false">8090</Config>
 
-  <!-- ── Data paths ── -->
+  <!-- ── Data path ── -->
   <Config
-    Name="PostgreSQL Data Path"
-    Target="/var/lib/postgresql/data"
-    Default="/mnt/user/appdata/shopping-companion/postgres"
-    Mode="rw"
-    Description="Where PostgreSQL stores its database files on the Unraid host"
-    Type="Path"
+    Name="AppData Path"
+    Target="APPDATA_PATH"
+    Default="/mnt/user/appdata/shopping-companion"
+    Mode=""
+    Description="Base folder on the Unraid host where all app data is stored. PostgreSQL files go in {path}/postgres and Redis files in {path}/redis. Change to /mnt/cache/appdata/shopping-companion to store on cache drive instead."
+    Type="Variable"
     Display="always"
     Required="true"
-    Mask="false">/mnt/user/appdata/shopping-companion/postgres</Config>
-
-  <Config
-    Name="Redis Data Path"
-    Target="/data"
-    Default="/mnt/user/appdata/shopping-companion/redis"
-    Mode="rw"
-    Description="Where Redis stores its persistence files on the Unraid host"
-    Type="Path"
-    Display="always"
-    Required="true"
-    Mask="false">/mnt/user/appdata/shopping-companion/redis</Config>
+    Mask="false">/mnt/user/appdata/shopping-companion</Config>
 
   <!-- ═══════════════════════════════════════════
        REQUIRED — must be filled in before starting
