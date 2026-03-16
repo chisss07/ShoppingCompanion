@@ -72,7 +72,7 @@ class SearchResult(Base):
     shipping_cost: Mapped[Optional[Any]] = mapped_column(Numeric(8, 2), nullable=True)
     availability: Mapped[str] = mapped_column(String(80), nullable=False)
     seller_name: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
-    seller_rating: Mapped[Optional[Any]] = mapped_column(Numeric(3, 2), nullable=True)
+    seller_rating: Mapped[Optional[Any]] = mapped_column(Numeric(5, 2), nullable=True)
     product_url: Mapped[str] = mapped_column(Text, nullable=False)
     image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     condition: Mapped[str] = mapped_column(String(40), nullable=False, default="new")

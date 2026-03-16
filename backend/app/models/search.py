@@ -241,9 +241,9 @@ class SearchResult(Base):
         nullable=True,
     )
     seller_rating: Mapped[Optional[Decimal]] = mapped_column(
-        Numeric(3, 2),
+        Numeric(5, 2),
         nullable=True,
-        doc="Seller rating on a 0.00-5.00 scale.",
+        doc="Seller rating (0.00-100.00 scale depending on source).",
     )
     product_url: Mapped[str] = mapped_column(
         Text,
