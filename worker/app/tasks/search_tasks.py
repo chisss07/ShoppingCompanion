@@ -224,7 +224,7 @@ async def _mark_session_error(session_id: str, error_message: str) -> None:
 
 @app.task(
     bind=True,
-    name="search.run",
+    name="app.tasks.search_tasks.run_search",
     queue="search",
     max_retries=2,
     default_retry_delay=10,
