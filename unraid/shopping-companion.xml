@@ -18,10 +18,10 @@
   <!-- ── Web UI port ── -->
   <Config
     Name="Web UI Port"
-    Target="8090"
+    Target="80"
     Default="8090"
     Mode="tcp"
-    Description="Port to access the Shopping Companion web UI"
+    Description="Host port to access the Shopping Companion web UI (maps to container port 80)"
     Type="Port"
     Display="always"
     Required="true"
