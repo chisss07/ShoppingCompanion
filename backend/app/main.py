@@ -57,11 +57,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     from accepting requests.
     """
     # ── Startup ─────────────────────────────────────────────────────────────
+    import re as _re
+    _db_url_masked = _re.sub(r":[^:@]+@", ":***@", settings.DATABASE_URL)
     logger.info(
         "app_starting",
         app_env=settings.APP_ENV,
         log_level=settings.LOG_LEVEL,
         debug=settings.DEBUG,
+        database_url=_db_url_masked,
     )
 
     # Create all tables that don't yet exist.
@@ -75,8 +78,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("database_schema_ready")
     except Exception as exc:  # pylint: disable=broad-except
         logger.error("database_schema_failed", error=str(exc))
-        if settings.is_production:
-            raise
+        # Non-fatal: server starts and returns errors on DB-dependent endpoints.
+        # Check the database_url in the app_starting log above.
 
     # Verify Redis is reachable before opening the server
     try:
