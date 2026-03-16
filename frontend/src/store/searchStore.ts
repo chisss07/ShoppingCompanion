@@ -254,8 +254,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     try {
       const response = await historyApi.list(page, limit, q);
       set({
-        history: response.items,
-        historyTotal: response.total,
+        history: Array.isArray(response.items) ? response.items : [],
+        historyTotal: typeof response.total === 'number' ? response.total : 0,
         historyLoading: false,
       });
     } catch (err) {
