@@ -53,16 +53,14 @@ class Settings(BaseSettings):
         """Build the asyncpg URL using URL.create() so the password is
         properly percent-encoded regardless of what characters it contains."""
         from sqlalchemy.engine import URL
-        return str(
-            URL.create(
-                "postgresql+asyncpg",
-                username=self.POSTGRES_USER,
-                password=self.POSTGRES_PASSWORD,
-                host=self.POSTGRES_HOST,
-                port=self.POSTGRES_PORT,
-                database=self.POSTGRES_DB,
-            )
-        )
+        return URL.create(
+            "postgresql+asyncpg",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_HOST,
+            port=self.POSTGRES_PORT,
+            database=self.POSTGRES_DB,
+        ).render_as_string(hide_password=False)
 
     # ── Redis ────────────────────────────────────────────────────────────────
     REDIS_URL: str = "redis://localhost:6379/0"
