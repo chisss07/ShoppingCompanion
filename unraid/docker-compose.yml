@@ -14,30 +14,13 @@
 
 services:
 
-  # ── nginx reverse proxy + frontend ──────────────────────
-  frontend:
-    image: chisss/shoppingcompanion-frontend:latest
-    container_name: shopping-frontend
+  # ── All-in-one app (nginx + backend + websocket + worker) ─
+  app:
+    image: chisss/shoppingcompanion:latest
+    container_name: shopping-companion
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-8090}:80"
-    networks:
-      - shopping-net
-    depends_on:
-      backend:
-        condition: service_healthy
-      websocket:
-        condition: service_healthy
-    labels:
-      - "net.unraid.docker.managed=composeman"
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/chisss07/ShoppingCompanion/main/docs/icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:8090]/"
-
-  # ── FastAPI backend ──────────────────────────────────────
-  backend:
-    image: chisss/shoppingcompanion-backend:latest
-    container_name: shopping-backend
-    restart: unless-stopped
     environment:
       APP_ENV: ${APP_ENV:-production}
       DEBUG: "false"
@@ -73,67 +56,15 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
       interval: 20s
       timeout: 10s
-      start_period: 60s
+      start_period: 90s
       retries: 5
-
-  # ── Celery worker ────────────────────────────────────────
-  worker:
-    image: chisss/shoppingcompanion-worker:latest
-    container_name: shopping-worker
-    restart: unless-stopped
-    environment:
-      APP_ENV: ${APP_ENV:-production}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: ${POSTGRES_USER:-shopping}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB:-shoppingcompanion}
-      REDIS_URL: redis://redis:6379/0
-      CELERY_BROKER_URL: redis://redis:6379/1
-      CELERY_RESULT_BACKEND: redis://redis:6379/2
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      BESTBUY_API_KEY: ${BESTBUY_API_KEY:-}
-      SERPAPI_KEY: ${SERPAPI_KEY:-}
-      EBAY_APP_ID: ${EBAY_APP_ID:-}
-      EBAY_CERT_ID: ${EBAY_CERT_ID:-}
-      EBAY_OAUTH_TOKEN: ${EBAY_OAUTH_TOKEN:-}
-      AMAZON_ACCESS_KEY: ${AMAZON_ACCESS_KEY:-}
-      AMAZON_SECRET_KEY: ${AMAZON_SECRET_KEY:-}
-      AMAZON_PARTNER_TAG: ${AMAZON_PARTNER_TAG:-}
-      WALMART_CONSUMER_ID: ${WALMART_CONSUMER_ID:-}
-      WALMART_PRIVATE_KEY: ${WALMART_PRIVATE_KEY:-}
-    networks:
-      - shopping-net
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  # ── WebSocket server ─────────────────────────────────────
-  websocket:
-    image: chisss/shoppingcompanion-websocket:latest
-    container_name: shopping-websocket
-    restart: unless-stopped
-    environment:
-      REDIS_URL: redis://redis:6379/0
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-      DEBUG: "false"
-    networks:
-      - shopping-net
-    depends_on:
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-      interval: 15s
-      timeout: 5s
-      start_period: 30s
-      retries: 3
+    labels:
+      - "net.unraid.docker.managed=composeman"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/chisss07/ShoppingCompanion/main/docs/icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8090]/"
 
   # ── PostgreSQL 16 ────────────────────────────────────────
   postgres:

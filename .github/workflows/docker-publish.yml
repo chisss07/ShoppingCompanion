@@ -30,6 +30,10 @@ jobs:
           - service: websocket
             context: ./websocket
             dockerfile: ./websocket/Dockerfile
+          # Combined single-container image (nginx + backend + websocket + worker)
+          - service: combined
+            context: .
+            dockerfile: ./deploy/Dockerfile
 
     steps:
       - name: Checkout
@@ -49,7 +53,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5.7.0
         with:
-          images: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          images: ${{ matrix.service == 'combined' && env.IMAGE_PREFIX || format('{0}-{1}', env.IMAGE_PREFIX, matrix.service) }}
           tags: |
             type=ref,event=branch
             type=sha,prefix=sha-
