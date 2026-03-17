@@ -60,8 +60,16 @@ class SourceManager:
             self.adapters.append(EbaySourceAdapter(settings.EBAY_OAUTH_TOKEN))
             logger.info("source_adapter_enabled", adapter="eBay")
 
-        # Mock adapter is always present for dev / testing
-        self.adapters.append(MockSourceAdapter())
+        # Mock adapter is only used as a fallback when no real sources are configured.
+        # In production with API keys set, real adapters run exclusively.
+        if not self.adapters:
+            self.adapters.append(MockSourceAdapter())
+            logger.warning(
+                "source_manager_no_real_adapters",
+                fallback="mock",
+                hint="Set SERPAPI_KEY, BESTBUY_API_KEY, or EBAY_OAUTH_TOKEN to enable real search",
+            )
+
         logger.info(
             "source_manager_ready",
             adapter_count=len(self.adapters),
