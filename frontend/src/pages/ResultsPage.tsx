@@ -94,7 +94,13 @@ export default function ResultsPage() {
         <button
           onClick={() => navigate('/')}
           aria-label="Back to search"
-          className="flex-shrink-0 p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 transition-colors"
+          className={clsx(
+            'flex-shrink-0 p-2 rounded-lg',
+            'text-neutral-500 dark:text-slate-400',
+            'hover:bg-primary-50 dark:hover:bg-primary-900/30',
+            'hover:text-primary-700 dark:hover:text-primary-300',
+            'transition-colors',
+          )}
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -113,12 +119,23 @@ export default function ResultsPage() {
       {hasError && (
         <div
           role="alert"
-          className="flex items-start gap-3 bg-danger-50 border border-danger-200 rounded-card p-4"
+          className={clsx(
+            'flex items-start gap-3 rounded-card p-4',
+            'bg-danger-50 dark:bg-danger-500/10',
+            'border border-danger-200 dark:border-danger-500/20',
+          )}
         >
-          <AlertCircle className="h-5 w-5 text-danger-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <AlertCircle
+            className="h-5 w-5 text-danger-500 flex-shrink-0 mt-0.5"
+            aria-hidden="true"
+          />
           <div>
-            <p className="text-sm font-semibold text-danger-800">Search failed</p>
-            <p className="text-sm text-danger-700 mt-0.5">{searchError}</p>
+            <p className="text-sm font-semibold text-danger-800 dark:text-red-400">
+              Search failed
+            </p>
+            <p className="text-sm text-danger-700 dark:text-red-400/80 mt-0.5">
+              {searchError}
+            </p>
           </div>
         </div>
       )}
@@ -131,10 +148,11 @@ export default function ResultsPage() {
 
           {/* Comparison section header */}
           <div className="flex items-center justify-between gap-4">
-            <h2 className="text-sm font-semibold text-neutral-700">
+            <h2 className="text-sm font-semibold text-neutral-700 dark:text-slate-300">
               Price comparison
-              <span className="ml-2 text-neutral-400 font-normal">
-                ({results.comparison.length} source{results.comparison.length !== 1 ? 's' : ''})
+              <span className="ml-2 text-neutral-400 dark:text-slate-500 font-normal">
+                ({results.comparison.length} source
+                {results.comparison.length !== 1 ? 's' : ''})
               </span>
             </h2>
 
@@ -145,8 +163,11 @@ export default function ResultsPage() {
                 onChange={(e) => setSort(e.target.value as SortOption)}
                 aria-label="Sort results"
                 className={clsx(
-                  'text-xs text-neutral-600 bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5',
-                  'focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-primary-600',
+                  'text-xs text-neutral-600 dark:text-slate-300',
+                  'bg-white dark:bg-dark-surface',
+                  'border border-primary-200 dark:border-dark-border',
+                  'rounded-lg px-2.5 py-1.5',
+                  'focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:border-primary-600',
                   'transition-colors duration-150',
                 )}
               >
@@ -158,14 +179,16 @@ export default function ResultsPage() {
               </select>
 
               {/* Grid/List toggle */}
-              <div className="flex border border-neutral-200 rounded-lg overflow-hidden">
+              <div className="flex border border-primary-200 dark:border-dark-border rounded-lg overflow-hidden">
                 <button
                   onClick={() => setGridView(true)}
                   aria-label="Grid view"
                   aria-pressed={gridView}
                   className={clsx(
                     'p-1.5 transition-colors duration-150',
-                    gridView ? 'bg-primary-600 text-white' : 'bg-white text-neutral-500 hover:bg-neutral-50',
+                    gridView
+                      ? 'bg-primary-600 dark:bg-primary-500 text-white'
+                      : 'bg-white dark:bg-dark-surface text-neutral-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-primary-900/30',
                   )}
                 >
                   <LayoutGrid className="h-3.5 w-3.5" aria-hidden="true" />
@@ -176,7 +199,9 @@ export default function ResultsPage() {
                   aria-pressed={!gridView}
                   className={clsx(
                     'p-1.5 transition-colors duration-150',
-                    !gridView ? 'bg-primary-600 text-white' : 'bg-white text-neutral-500 hover:bg-neutral-50',
+                    !gridView
+                      ? 'bg-primary-600 dark:bg-primary-500 text-white'
+                      : 'bg-white dark:bg-dark-surface text-neutral-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-primary-900/30',
                   )}
                 >
                   <List className="h-3.5 w-3.5" aria-hidden="true" />
@@ -205,9 +230,9 @@ export default function ResultsPage() {
           {/* Alternatives section */}
           {results.alternatives.length > 0 && (
             <section aria-label="Alternative products">
-              <h2 className="text-sm font-semibold text-neutral-700 mb-3">
+              <h2 className="text-sm font-semibold text-neutral-700 dark:text-slate-300 mb-3">
                 Alternatives & related models
-                <span className="ml-2 text-neutral-400 font-normal">
+                <span className="ml-2 text-neutral-400 dark:text-slate-500 font-normal">
                   ({results.alternatives.length})
                 </span>
               </h2>
@@ -227,8 +252,8 @@ export default function ResultsPage() {
 
       {/* Empty state while not yet searching and no results */}
       {!isLoading && !hasResults && !hasError && (
-        <div className="text-center py-16 text-neutral-400 text-sm">
-          Loading results…
+        <div className="text-center py-16 text-neutral-400 dark:text-slate-500 text-sm">
+          Loading results...
         </div>
       )}
     </div>

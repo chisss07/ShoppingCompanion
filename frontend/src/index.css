@@ -6,40 +6,42 @@
    Design Tokens as CSS Custom Properties
    ───────────────────────────────────────────── */
 :root {
-  /* Brand colors */
-  --color-primary-50: #F7F8FE;
-  --color-primary-100: #EEF0FD;
-  --color-primary-400: #8FA0F6;
-  --color-primary-500: #6B7FEF;
-  --color-primary-600: #4059D9;
-  --color-primary-700: #3645AE;
-  --color-primary-800: #283080;
-  --color-primary-900: #1A1F52;
-
-  /* Semantic colors */
-  --color-success: #28A062;
-  --color-warning: #F5A000;
-  --color-danger: #D93535;
-
-  /* Surface */
-  --color-bg: #F9F9FB;
-  --color-card: #ffffff;
-  --color-border: #E2E4E9;
-  --color-border-strong: #CDD0D9;
-
-  /* Typography */
-  --color-text-primary: #111827;
-  --color-text-secondary: #4B5563;
-  --color-text-tertiary: #9EA3B0;
+  /* Brand colors — light mode */
+  --color-bg: #f0f4ff;
+  --color-surface: #ffffff;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-border: #dbeafe;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-sidebar-bg: #1e3a8a;
+  --color-sidebar-text: #bfdbfe;
+  --color-sidebar-active: #2563eb;
 
   /* Radius */
   --radius-card: 12px;
   --radius-badge: 6px;
   --radius-button: 8px;
 
-  /* Shadows */
-  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
-  --shadow-card-hover: 0 4px 12px 0 rgb(0 0 0 / 0.08), 0 2px 4px -1px rgb(0 0 0 / 0.05);
+  /* Shadows — blue-tinted in light mode */
+  --shadow-card: 0 1px 3px 0 rgb(37 99 235 / 0.06), 0 1px 2px -1px rgb(37 99 235 / 0.04);
+  --shadow-card-hover: 0 4px 16px 0 rgb(37 99 235 / 0.12), 0 2px 4px -1px rgb(37 99 235 / 0.06);
+}
+
+.dark {
+  /* Dark mode tokens */
+  --color-bg: #060d1f;
+  --color-surface: #0d1b3e;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-border: #1e3a8a;
+  --color-text: #e2e8f0;
+  --color-text-muted: #94a3b8;
+  --color-sidebar-bg: #030712;
+  --color-sidebar-text: #93c5fd;
+
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-card-hover: 0 4px 16px 0 rgb(0 0 0 / 0.5), 0 2px 4px -1px rgb(0 0 0 / 0.3);
 }
 
 /* ─────────────────────────────────────────────
@@ -55,12 +57,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
   body {
-    @apply bg-neutral-50 text-neutral-900 font-sans;
+    @apply bg-[#f0f4ff] dark:bg-[#060d1f] text-neutral-900 dark:text-slate-200 font-sans;
     min-height: 100dvh;
     margin: 0;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   #root {
@@ -71,7 +75,7 @@
 
   /* Focus visible — accessible ring */
   :focus-visible {
-    @apply outline-2 outline-primary-600 outline-offset-2;
+    @apply outline-2 outline-primary-600 dark:outline-primary-400 outline-offset-2;
   }
 
   /* Remove focus ring for mouse interactions */
@@ -85,13 +89,13 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-neutral-100;
+    @apply bg-primary-50 dark:bg-dark-bg;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-neutral-300 rounded-full;
+    @apply bg-primary-200 dark:bg-primary-900 rounded-full;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-400;
+    @apply bg-primary-300 dark:bg-primary-800;
   }
 }
 
@@ -100,11 +104,11 @@
    ───────────────────────────────────────────── */
 @layer components {
   .card {
-    @apply bg-white border border-neutral-200 rounded-card shadow-card;
+    @apply bg-white dark:bg-dark-surface border border-primary-100 dark:border-dark-border rounded-card shadow-card dark:shadow-card-dark;
   }
 
   .card-hover {
-    @apply transition-shadow duration-200 hover:shadow-card-hover;
+    @apply transition-shadow duration-200 hover:shadow-card-hover dark:hover:shadow-card-dark-hover;
   }
 
   .price-text {
@@ -118,7 +122,7 @@
 
   /* Source step connector line */
   .step-connector {
-    @apply h-0.5 flex-1 bg-neutral-200;
+    @apply h-0.5 flex-1 bg-primary-100 dark:bg-primary-900;
     transition: background-color 0.3s ease;
   }
 
@@ -128,7 +132,26 @@
 
   /* Gradient badge for AI */
   .badge-ai {
-    background: linear-gradient(135deg, #4059D9 0%, #6B7FEF 100%);
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  }
+
+  /* Auth page centering */
+  .auth-page {
+    @apply min-h-screen flex items-center justify-center bg-[#f0f4ff] dark:bg-[#060d1f] px-4 py-12;
+  }
+
+  .auth-card {
+    @apply w-full max-w-md bg-white dark:bg-dark-surface border border-primary-100 dark:border-dark-border rounded-card shadow-card dark:shadow-card-dark p-8;
+  }
+
+  /* Input base style */
+  .input-base {
+    @apply w-full px-3 py-2.5 rounded-button border border-primary-200 dark:border-dark-border
+           bg-white dark:bg-[#0a1628]
+           text-neutral-900 dark:text-slate-200
+           placeholder:text-neutral-400 dark:placeholder:text-slate-500
+           focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:border-primary-600 dark:focus:border-primary-400
+           transition-colors duration-150 text-sm;
   }
 }
 

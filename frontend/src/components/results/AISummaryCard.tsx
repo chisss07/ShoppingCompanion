@@ -19,14 +19,16 @@ function HighlightChip({ icon, label, value, color }: HighlightChipProps) {
     <div
       className={clsx(
         'flex items-center gap-2 rounded-lg px-3 py-2',
-        'bg-white/60 border border-white/80',
+        'bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/10',
         'backdrop-blur-sm',
       )}
     >
       <span className={clsx('flex-shrink-0', color)}>{icon}</span>
       <div className="min-w-0">
-        <div className="text-xs text-neutral-500 leading-none mb-0.5">{label}</div>
-        <div className="text-sm font-semibold text-neutral-800 truncate">{value}</div>
+        <div className="text-xs text-blue-100/70 dark:text-blue-200/60 leading-none mb-0.5">
+          {label}
+        </div>
+        <div className="text-sm font-semibold text-white truncate">{value}</div>
       </div>
     </div>
   );
@@ -46,18 +48,21 @@ export function AISummaryCard({ results }: AISummaryCardProps) {
   if (!summary) return null;
 
   // Derive highlight values from comparison data
-  const lowestPriceEntry = comparison.reduce<typeof comparison[0] | null>(
+  const lowestPriceEntry = comparison.reduce<(typeof comparison)[0] | null>(
     (best, entry) => (best === null || entry.price < best.price ? entry : best),
     null,
   );
 
   const inStockEntry = comparison.find(
-    (e) => e.availability.toLowerCase().includes('in stock') || e.availability.toLowerCase().includes('available'),
+    (e) =>
+      e.availability.toLowerCase().includes('in stock') ||
+      e.availability.toLowerCase().includes('available'),
   );
 
-  const highestRatedEntry = comparison.reduce<typeof comparison[0] | null>(
+  const highestRatedEntry = comparison.reduce<(typeof comparison)[0] | null>(
     (best, entry) =>
-      entry.seller_rating !== null && (best === null || (best.seller_rating ?? 0) < entry.seller_rating)
+      entry.seller_rating !== null &&
+      (best === null || (best.seller_rating ?? 0) < entry.seller_rating)
         ? entry
         : best,
     null,
@@ -67,13 +72,20 @@ export function AISummaryCard({ results }: AISummaryCardProps) {
     <section
       aria-label="AI Summary"
       className={clsx(
-        'relative overflow-hidden rounded-card border border-primary-100 shadow-card',
-        'bg-gradient-to-br from-primary-50 via-white to-primary-50/30',
+        'relative overflow-hidden rounded-card',
+        // Light: rich blue gradient
+        'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700',
+        // Dark: deeper navy
+        'dark:bg-gradient-to-br dark:from-[#030c24] dark:via-[#0d1b3e] dark:to-[#0d1b3e]',
       )}
     >
-      {/* Decorative gradient blob */}
+      {/* Decorative blob */}
       <div
-        className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-primary-600/8 blur-3xl pointer-events-none"
+        className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-primary-500/20 blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute bottom-0 left-1/4 h-32 w-32 rounded-full bg-blue-400/10 blur-2xl pointer-events-none"
         aria-hidden="true"
       />
 
@@ -84,17 +96,15 @@ export function AISummaryCard({ results }: AISummaryCardProps) {
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
             AI Summary
           </span>
-          <span className="text-xs text-neutral-400">Powered by comparative analysis</span>
+          <span className="text-xs text-blue-200/60">Powered by comparative analysis</span>
         </div>
 
         {/* Summary text */}
-        <p className="text-sm text-neutral-700 leading-relaxed">
-          {summary.top_pick_summary}
-        </p>
+        <p className="text-sm text-blue-50 leading-relaxed">{summary.top_pick_summary}</p>
 
         {/* Caveats */}
         {summary.caveats && (
-          <p className="text-xs text-neutral-500 italic border-l-2 border-neutral-200 pl-3">
+          <p className="text-xs text-blue-200/70 italic border-l-2 border-blue-400/40 pl-3">
             {summary.caveats}
           </p>
         )}
@@ -106,7 +116,7 @@ export function AISummaryCard({ results }: AISummaryCardProps) {
               icon={<DollarSign className="h-4 w-4" />}
               label="Lowest Price"
               value={`${lowestPriceEntry.source} — ${formatPrice(lowestPriceEntry.price)}`}
-              color="text-success-600"
+              color="text-green-300"
             />
           )}
           {inStockEntry && (
@@ -114,7 +124,7 @@ export function AISummaryCard({ results }: AISummaryCardProps) {
               icon={<Package className="h-4 w-4" />}
               label="Best Availability"
               value={inStockEntry.source}
-              color="text-primary-600"
+              color="text-blue-300"
             />
           )}
           {highestRatedEntry && highestRatedEntry.seller_rating !== null && (
@@ -122,7 +132,7 @@ export function AISummaryCard({ results }: AISummaryCardProps) {
               icon={<ShieldCheck className="h-4 w-4" />}
               label="Top-Rated Seller"
               value={`${highestRatedEntry.source} (${highestRatedEntry.seller_rating.toFixed(1)}/5)`}
-              color="text-warning-600"
+              color="text-yellow-300"
             />
           )}
         </div>

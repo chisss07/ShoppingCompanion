@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import health, history, search
+from app.api.v1.endpoints import auth, health, history, search, settings
 
 # Root v1 router — prefix applied in main.py when mounting
 api_v1_router = APIRouter()
@@ -29,3 +29,14 @@ api_v1_router.include_router(history.router)
 # (which has no /api/v1 prefix) is also reachable.
 # We include health here only for the /api/v1/sources route.
 api_v1_router.include_router(health.router)
+
+# ── Auth ─────────────────────────────────────────────────────────────────────
+# Endpoints: GET /api/v1/auth/status
+#            POST /api/v1/auth/setup
+#            POST /api/v1/auth/login
+api_v1_router.include_router(auth.router)
+
+# ── Settings ─────────────────────────────────────────────────────────────────
+# Endpoints: GET /api/v1/settings   (admin-only)
+#            PUT /api/v1/settings   (admin-only)
+api_v1_router.include_router(settings.router)

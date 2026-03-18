@@ -115,3 +115,13 @@ class AlternativeProduct(Base):
     price_max: Mapped[Optional[Any]] = mapped_column(Numeric(10, 2), nullable=True)
     recommendation_strength: Mapped[str] = mapped_column(String(20), nullable=False)
     source_urls: Mapped[list[Any]] = mapped_column(JSONB, nullable=False, default=list)
+
+
+class AppSetting(Base):
+    """Key-value store for runtime-configurable settings (managed via the UI Settings page)."""
+
+    __tablename__ = "app_settings"
+
+    key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    value: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=_now_utc)

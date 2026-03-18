@@ -19,12 +19,18 @@ function StepIcon({ status }: { status: SourceStepStatus }) {
     case 'active':
       return (
         <span className="relative flex h-5 w-5 items-center justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-primary-600" aria-hidden="true" />
+          <Loader2
+            className="h-5 w-5 animate-spin text-primary-600 dark:text-primary-400"
+            aria-hidden="true"
+          />
         </span>
       );
     default:
       return (
-        <span className="h-5 w-5 rounded-full border-2 border-neutral-300 bg-white" aria-hidden="true" />
+        <span
+          className="h-5 w-5 rounded-full border-2 border-primary-200 dark:border-primary-800 bg-white dark:bg-dark-surface"
+          aria-hidden="true"
+        />
       );
   }
 }
@@ -34,6 +40,9 @@ function StepIcon({ status }: { status: SourceStepStatus }) {
 // ─────────────────────────────────────────────
 
 function SourceStepItem({ step, isLast }: { step: SourceStep; isLast: boolean }) {
+  const isDone =
+    step.status === 'complete' || step.status === 'error' || step.status === 'timeout';
+
   return (
     <li className="flex flex-col items-center gap-1 flex-1 min-w-0">
       <div className="flex w-full items-center">
@@ -41,9 +50,9 @@ function SourceStepItem({ step, isLast }: { step: SourceStep; isLast: boolean })
         <div
           className={clsx(
             'flex-1 h-0.5 transition-colors duration-500',
-            step.status === 'complete' || step.status === 'error' || step.status === 'timeout'
-              ? 'bg-neutral-300'
-              : 'bg-neutral-200',
+            isDone
+              ? 'bg-primary-300 dark:bg-primary-700'
+              : 'bg-primary-100 dark:bg-primary-900/60',
           )}
           aria-hidden="true"
         />
@@ -56,7 +65,9 @@ function SourceStepItem({ step, isLast }: { step: SourceStep; isLast: boolean })
           <div
             className={clsx(
               'flex-1 h-0.5 transition-colors duration-500',
-              step.status === 'complete' ? 'bg-success-500' : 'bg-neutral-200',
+              step.status === 'complete'
+                ? 'bg-success-500'
+                : 'bg-primary-100 dark:bg-primary-900/60',
             )}
             aria-hidden="true"
           />
@@ -69,11 +80,11 @@ function SourceStepItem({ step, isLast }: { step: SourceStep; isLast: boolean })
       <span
         className={clsx(
           'text-xs font-medium text-center leading-tight px-0.5 truncate max-w-full',
-          step.status === 'active' && 'text-primary-700',
-          step.status === 'complete' && 'text-success-700',
-          step.status === 'error' && 'text-danger-600',
-          step.status === 'timeout' && 'text-warning-700',
-          step.status === 'pending' && 'text-neutral-400',
+          step.status === 'active' && 'text-primary-700 dark:text-primary-300',
+          step.status === 'complete' && 'text-success-700 dark:text-green-400',
+          step.status === 'error' && 'text-danger-600 dark:text-red-400',
+          step.status === 'timeout' && 'text-warning-700 dark:text-yellow-400',
+          step.status === 'pending' && 'text-neutral-400 dark:text-slate-500',
         )}
       >
         {step.display_name}
@@ -81,7 +92,7 @@ function SourceStepItem({ step, isLast }: { step: SourceStep; isLast: boolean })
 
       {/* Result count */}
       {step.results_count !== undefined && step.results_count > 0 && (
-        <span className="text-xs text-neutral-400">
+        <span className="text-xs text-neutral-400 dark:text-slate-500">
           {step.results_count} result{step.results_count !== 1 ? 's' : ''}
         </span>
       )}
@@ -136,16 +147,23 @@ export function ProgressTracker({ visible }: ProgressTrackerProps) {
         animateOut ? 'max-h-0 opacity-0' : 'max-h-64 opacity-100 animate-slide-down',
       )}
     >
-      <div className="bg-white border border-neutral-200 rounded-card shadow-card p-4 space-y-4">
+      <div
+        className={clsx(
+          'bg-white dark:bg-dark-surface',
+          'border border-primary-100 dark:border-dark-border',
+          'rounded-card shadow-card dark:shadow-card-dark',
+          'p-4 space-y-4',
+        )}
+      >
         {/* Progress bar */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-neutral-500">
+          <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-slate-400">
             <span>{statusText || 'Searching...'}</span>
-            <span className="font-mono tabular-nums font-medium text-primary-700">
+            <span className="font-mono tabular-nums font-medium text-primary-700 dark:text-primary-400">
               {progressPercent}%
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-primary-100 dark:bg-primary-900/40">
             <div
               role="progressbar"
               aria-valuenow={progressPercent}
@@ -153,7 +171,9 @@ export function ProgressTracker({ visible }: ProgressTrackerProps) {
               aria-valuemax={100}
               className={clsx(
                 'h-full rounded-full progress-fill',
-                isComplete ? 'bg-success-500' : 'bg-primary-600',
+                isComplete
+                  ? 'bg-success-500'
+                  : 'bg-primary-600 dark:bg-primary-500',
               )}
               style={{ width: `${progressPercent}%` }}
             />

@@ -300,6 +300,42 @@ def run_search(self, session_id: str, query: str, options: dict) -> dict:
             raise
 
 
+_API_KEY_NAMES = [
+    "SERPAPI_KEY",
+    "ANTHROPIC_API_KEY",
+    "BESTBUY_API_KEY",
+    "EBAY_APP_ID",
+    "EBAY_OAUTH_TOKEN",
+]
+
+
+async def _load_api_key_overrides() -> dict[str, str]:
+    """
+    Read API key values from the app_settings DB table.
+
+    Returns a dict mapping key name → value for any key that has a non-empty
+    value stored in the DB. Keys not found in the DB (or stored as NULL/empty)
+    are omitted so callers can fall back to environment variables.
+    """
+    from sqlalchemy import select
+
+    from app.db.models import AppSetting
+    from app.db.session import get_async_session
+
+    overrides: dict[str, str] = {}
+    try:
+        async with get_async_session() as db:
+            result = await db.execute(
+                select(AppSetting).where(AppSetting.key.in_(_API_KEY_NAMES))
+            )
+            for row in result.scalars():
+                if row.value:
+                    overrides[row.key] = row.value
+    except Exception as exc:
+        logger.warning("api_key_overrides_load_failed", error=str(exc))
+    return overrides
+
+
 async def _run_pipeline(
     task,
     session_id: str,
@@ -327,8 +363,14 @@ async def _run_pipeline(
     from app.sources.source_manager import SourceManager
 
     redis_client = _get_redis_client()
-    anthropic_client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
-    source_manager = SourceManager(settings)
+
+    # Load API key overrides from the DB settings table (set via the UI Settings page).
+    # Falls back to environment variables if a key is not stored in the DB.
+    key_overrides = await _load_api_key_overrides()
+    effective_anthropic_key = key_overrides.get("ANTHROPIC_API_KEY") or settings.ANTHROPIC_API_KEY
+
+    anthropic_client = AsyncAnthropic(api_key=effective_anthropic_key)
+    source_manager = SourceManager(settings, key_overrides=key_overrides)
 
     # ── Stage 1: search:started ──────────────────────────────────────────────
     _publish_event(

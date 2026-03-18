@@ -21,12 +21,18 @@ interface BadgeProps {
 // ─────────────────────────────────────────────
 
 const variantClasses: Record<BadgeVariant, string> = {
-  success: 'bg-success-100 text-success-700 border-success-500/20',
-  warning: 'bg-warning-100 text-warning-700 border-warning-500/20',
-  danger: 'bg-danger-100 text-danger-700 border-danger-500/20',
-  info: 'bg-primary-100 text-primary-700 border-primary-500/20',
-  neutral: 'bg-neutral-100 text-neutral-600 border-neutral-200',
-  primary: 'bg-primary-600 text-white border-transparent',
+  success:
+    'bg-success-100 text-success-700 border-success-500/20 dark:bg-success-500/15 dark:text-green-400 dark:border-success-500/20',
+  warning:
+    'bg-warning-100 text-warning-700 border-warning-500/20 dark:bg-warning-500/15 dark:text-yellow-400 dark:border-warning-500/20',
+  danger:
+    'bg-danger-100 text-danger-700 border-danger-500/20 dark:bg-danger-500/15 dark:text-red-400 dark:border-danger-500/20',
+  info:
+    'bg-primary-100 text-primary-700 border-primary-500/20 dark:bg-primary-500/15 dark:text-primary-300 dark:border-primary-500/20',
+  neutral:
+    'bg-neutral-100 text-neutral-600 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700',
+  primary:
+    'bg-primary-600 text-white border-transparent dark:bg-primary-500 dark:border-transparent',
 };
 
 const dotClasses: Record<BadgeVariant, string> = {

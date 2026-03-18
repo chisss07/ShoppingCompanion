@@ -54,25 +54,31 @@ export function SearchBar({
       <div
         className={clsx(
           'relative flex flex-1 items-center',
-          'bg-white border border-neutral-200 rounded-l-xl',
-          'focus-within:border-primary-600 focus-within:ring-2 focus-within:ring-primary-600/20',
+          'bg-white dark:bg-[#0a1628]',
+          'border border-primary-200 dark:border-dark-border',
+          'rounded-l-[10px]',
+          'focus-within:border-primary-600 dark:focus-within:border-primary-400',
+          'focus-within:ring-2 focus-within:ring-primary-600/20 dark:focus-within:ring-primary-400/20',
           'transition-colors duration-150',
           compact ? 'h-10' : 'h-14',
         )}
       >
         {/* Search icon */}
-        <span className={clsx('pl-3 flex-shrink-0 text-neutral-400', compact ? 'pl-2.5' : 'pl-4')}>
+        <span className={clsx('flex-shrink-0 text-neutral-400 dark:text-slate-500', compact ? 'pl-2.5' : 'pl-4')}>
           {isSearching ? (
             <span
               className={clsx(
-                'inline-block animate-spin rounded-full border-2 border-primary-600 border-t-transparent',
+                'inline-block animate-spin rounded-full border-2 border-primary-600 dark:border-primary-400 border-t-transparent',
                 compact ? 'h-4 w-4' : 'h-5 w-5',
               )}
               aria-hidden="true"
             />
           ) : (
             <Search
-              className={clsx('text-neutral-400', compact ? 'h-4 w-4' : 'h-5 w-5')}
+              className={clsx(
+                'text-neutral-400 dark:text-slate-500',
+                compact ? 'h-4 w-4' : 'h-5 w-5',
+              )}
               aria-hidden="true"
             />
           )}
@@ -90,7 +96,9 @@ export function SearchBar({
           autoComplete="off"
           spellCheck="false"
           className={clsx(
-            'flex-1 bg-transparent text-neutral-900 placeholder:text-neutral-400',
+            'flex-1 bg-transparent',
+            'text-neutral-900 dark:text-slate-200',
+            'placeholder:text-neutral-400 dark:placeholder:text-slate-500',
             'focus:outline-none',
             compact ? 'px-2 text-sm' : 'px-3 text-base',
             '[appearance:textfield] [&::-webkit-search-cancel-button]:hidden',
@@ -105,7 +113,8 @@ export function SearchBar({
             onClick={handleClear}
             aria-label="Clear search"
             className={clsx(
-              'flex-shrink-0 text-neutral-400 hover:text-neutral-600 transition-colors',
+              'flex-shrink-0 text-neutral-400 dark:text-slate-500',
+              'hover:text-neutral-600 dark:hover:text-slate-300 transition-colors',
               compact ? 'pr-2' : 'pr-3',
             )}
           >
@@ -122,10 +131,12 @@ export function SearchBar({
         className={clsx(
           'flex-shrink-0 font-medium text-white',
           'bg-primary-600 hover:bg-primary-700 active:bg-primary-800',
-          'border border-primary-700 rounded-r-xl',
+          'dark:bg-primary-500 dark:hover:bg-primary-600 dark:active:bg-primary-700',
+          'border border-primary-700 dark:border-primary-600',
+          'rounded-r-[10px]',
           'transition-colors duration-150',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 dark:focus-visible:ring-primary-400 focus-visible:ring-offset-2',
           compact ? 'px-4 h-10 text-sm' : 'px-6 h-14 text-base',
         )}
       >

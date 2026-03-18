@@ -1,9 +1,20 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { History, Trash2, ChevronRight, ShoppingBag, Clock } from 'lucide-react';
+import {
+  History,
+  Trash2,
+  ChevronRight,
+  Search,
+  Clock,
+  Settings,
+  Sun,
+  Moon,
+} from 'lucide-react';
 import { clsx } from 'clsx';
 import { useSearchStore } from '../../store/searchStore';
 import { formatPrice } from '../../services/api';
+import { Logo } from '../ui/Logo';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 // ─────────────────────────────────────────────
 // Helpers
@@ -37,7 +48,14 @@ interface HistoryRowProps {
   onDelete: (id: string) => void;
 }
 
-function HistoryRow({ sessionId, queryText, createdAt, bestPrice, bestSource, onDelete }: HistoryRowProps) {
+function HistoryRow({
+  sessionId,
+  queryText,
+  createdAt,
+  bestPrice,
+  bestSource,
+  onDelete,
+}: HistoryRowProps) {
   const navigate = useNavigate();
   const [showDelete, setShowDelete] = useState(false);
 
@@ -51,24 +69,30 @@ function HistoryRow({ sessionId, queryText, createdAt, bestPrice, bestSource, on
         onClick={() => navigate(`/results/${sessionId}`)}
         className={clsx(
           'w-full text-left px-3 py-2.5 rounded-lg transition-colors duration-150',
-          'hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600',
+          'hover:bg-primary-800/60 dark:hover:bg-primary-900/60',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400',
         )}
       >
         <div className="flex items-start gap-2 pr-6">
-          <Clock className="h-3.5 w-3.5 text-neutral-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <Clock
+            className="h-3.5 w-3.5 text-primary-300/60 dark:text-primary-400/60 flex-shrink-0 mt-0.5"
+            aria-hidden="true"
+          />
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-neutral-800 line-clamp-2 leading-snug">
+            <p className="text-xs font-medium text-primary-100 dark:text-primary-200 line-clamp-2 leading-snug">
               {queryText}
             </p>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="text-xs text-neutral-400">{formatRelativeTime(createdAt)}</span>
+              <span className="text-xs text-primary-300/70 dark:text-primary-400/70">
+                {formatRelativeTime(createdAt)}
+              </span>
               {bestPrice !== null && bestSource && (
                 <>
-                  <span className="text-neutral-300 text-xs">·</span>
-                  <span className="text-xs text-success-700 font-medium font-mono tabular-nums">
+                  <span className="text-primary-300/50 text-xs">·</span>
+                  <span className="text-xs text-green-400 font-medium font-mono tabular-nums">
                     {formatPrice(bestPrice)}
                   </span>
-                  <span className="text-xs text-neutral-400 truncate">{bestSource}</span>
+                  <span className="text-xs text-primary-300/60 truncate">{bestSource}</span>
                 </>
               )}
             </div>
@@ -85,7 +109,7 @@ function HistoryRow({ sessionId, queryText, createdAt, bestPrice, bestSource, on
         aria-label={`Delete search: ${queryText}`}
         className={clsx(
           'absolute right-2 top-1/2 -translate-y-1/2',
-          'p-1 rounded text-neutral-400 hover:text-danger-600 hover:bg-danger-50',
+          'p-1 rounded text-primary-300/60 hover:text-red-400 hover:bg-red-500/10',
           'transition-all duration-150',
           showDelete ? 'opacity-100' : 'opacity-0 pointer-events-none',
         )}
@@ -106,6 +130,7 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const { history, historyLoading, loadHistory, deleteHistory } = useSearchStore();
+  const { isDark, toggle: toggleDark } = useDarkMode();
 
   useEffect(() => {
     void loadHistory(1, 20);
@@ -113,66 +138,68 @@ export function Sidebar({ className }: SidebarProps) {
 
   const recentHistory = history.slice(0, 10);
 
+  // Nav link style factory
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    clsx(
+      'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
+      isActive
+        ? 'bg-primary-600 text-white shadow-sm'
+        : 'text-primary-200 dark:text-primary-300 hover:bg-primary-800/60 dark:hover:bg-primary-900/60 hover:text-white',
+    );
+
   return (
     <aside
       className={clsx(
-        'flex flex-col h-full bg-neutral-50 border-r border-neutral-200',
+        'flex flex-col h-full',
+        'bg-primary-900 dark:bg-gray-950',
         'w-[280px] flex-shrink-0',
         className,
       )}
       aria-label="Sidebar navigation"
     >
       {/* Brand */}
-      <div className="px-4 py-4 border-b border-neutral-200">
-        <NavLink
-          to="/"
-          className="flex items-center gap-2.5 group"
-          aria-label="Shopping Companion home"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 shadow-sm">
-            <ShoppingBag className="h-4.5 w-4.5 text-white" aria-hidden="true" />
-          </span>
-          <div>
-            <span className="text-sm font-bold text-neutral-900 block leading-tight">
-              Shopping
-            </span>
-            <span className="text-xs text-neutral-500 leading-tight">Companion</span>
-          </div>
-        </NavLink>
+      <div className="px-4 py-4 border-b border-primary-800 dark:border-gray-800">
+        <div className="flex items-center justify-between">
+          <NavLink
+            to="/"
+            aria-label="ShopCompare home"
+          >
+            <Logo
+              size={28}
+              textClassName="text-sm"
+              className="text-primary-100"
+            />
+          </NavLink>
+
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggleDark}
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            className={clsx(
+              'p-1.5 rounded-lg transition-colors duration-150',
+              'text-primary-300 hover:text-white hover:bg-primary-800 dark:hover:bg-gray-800',
+            )}
+          >
+            {isDark ? (
+              <Sun className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Moon className="h-4 w-4" aria-hidden="true" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Navigation */}
       <nav className="px-3 pt-3 pb-1" aria-label="Main navigation">
         <ul className="space-y-0.5" role="list">
           <li>
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                clsx(
-                  'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
-                  isActive
-                    ? 'bg-primary-100 text-primary-800'
-                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
-                )
-              }
-            >
-              <ShoppingBag className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            <NavLink to="/" end className={navLinkClass}>
+              <Search className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
               Search
             </NavLink>
           </li>
           <li>
-            <NavLink
-              to="/history"
-              className={({ isActive }) =>
-                clsx(
-                  'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
-                  isActive
-                    ? 'bg-primary-100 text-primary-800'
-                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
-                )
-              }
-            >
+            <NavLink to="/history" className={navLinkClass}>
               <History className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
               History
             </NavLink>
@@ -183,13 +210,13 @@ export function Sidebar({ className }: SidebarProps) {
       {/* Recent searches */}
       <div className="flex-1 overflow-hidden flex flex-col px-3 pt-4">
         <div className="flex items-center justify-between mb-2 px-1">
-          <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-primary-400/80 uppercase tracking-wider">
             Recent
           </span>
           {history.length > 0 && (
             <button
               onClick={() => void deleteHistory()}
-              className="text-xs text-neutral-400 hover:text-danger-600 transition-colors duration-150"
+              className="text-xs text-primary-400/70 hover:text-red-400 transition-colors duration-150"
               aria-label="Clear all history"
             >
               Clear all
@@ -200,20 +227,23 @@ export function Sidebar({ className }: SidebarProps) {
         {historyLoading && (
           <div className="flex items-center justify-center py-6">
             <span
-              className="h-4 w-4 animate-spin rounded-full border-2 border-primary-600 border-t-transparent"
+              className="h-4 w-4 animate-spin rounded-full border-2 border-primary-400 border-t-transparent"
               aria-label="Loading history"
             />
           </div>
         )}
 
         {!historyLoading && recentHistory.length === 0 && (
-          <p className="text-xs text-neutral-400 px-1 py-2 italic">
+          <p className="text-xs text-primary-400/60 px-1 py-2 italic">
             No searches yet. Try searching for a product!
           </p>
         )}
 
         {!historyLoading && recentHistory.length > 0 && (
-          <ul className="overflow-y-auto flex-1 space-y-0.5 -mx-1 px-1" role="list">
+          <ul
+            className="overflow-y-auto flex-1 space-y-0.5 -mx-1 px-1 scrollbar-hide"
+            role="list"
+          >
             {recentHistory.map((item) => (
               <HistoryRow
                 key={item.session_id}
@@ -229,18 +259,38 @@ export function Sidebar({ className }: SidebarProps) {
         )}
       </div>
 
-      {/* Footer: view all */}
-      {history.length > 10 && (
-        <div className="px-4 py-3 border-t border-neutral-200">
+      {/* Footer: view all + settings */}
+      <div className="border-t border-primary-800 dark:border-gray-800">
+        {history.length > 10 && (
+          <div className="px-4 py-2 border-b border-primary-800/50 dark:border-gray-800/50">
+            <NavLink
+              to="/history"
+              className="flex items-center justify-center gap-1 text-xs text-primary-300 hover:text-white font-medium transition-colors duration-150"
+            >
+              View all history
+              <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </NavLink>
+          </div>
+        )}
+
+        {/* Settings link */}
+        <div className="px-3 py-3">
           <NavLink
-            to="/history"
-            className="flex items-center justify-center gap-1 text-xs text-primary-600 hover:text-primary-800 font-medium transition-colors duration-150"
+            to="/settings"
+            className={({ isActive }) =>
+              clsx(
+                'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
+                isActive
+                  ? 'bg-primary-600 text-white shadow-sm'
+                  : 'text-primary-300 hover:bg-primary-800/60 dark:hover:bg-primary-900/60 hover:text-white',
+              )
+            }
           >
-            View all history
-            <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+            <Settings className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            Settings
           </NavLink>
         </div>
-      )}
+      </div>
     </aside>
   );
 }

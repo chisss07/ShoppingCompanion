@@ -47,9 +47,16 @@ export function Card({
   return (
     <div
       className={clsx(
-        'bg-white border border-neutral-200 rounded-card',
-        elevated ? 'shadow-card-elevated' : 'shadow-card',
-        hoverable && 'transition-shadow duration-200 hover:shadow-card-hover cursor-pointer',
+        'bg-white dark:bg-dark-surface',
+        'border border-primary-100 dark:border-dark-border',
+        'rounded-card',
+        elevated
+          ? 'shadow-card-elevated dark:shadow-card-dark'
+          : 'shadow-card dark:shadow-card-dark',
+        hoverable && [
+          'transition-shadow duration-200 cursor-pointer',
+          'hover:shadow-card-hover dark:hover:shadow-card-dark-hover',
+        ],
         paddingClasses[padding],
         className,
       )}
@@ -67,7 +74,10 @@ export function Card({
 export function CardHeader({ children, className, ...props }: CardHeaderProps) {
   return (
     <div
-      className={clsx('border-b border-neutral-100 px-4 py-3', className)}
+      className={clsx(
+        'border-b border-primary-100 dark:border-dark-border px-4 py-3',
+        className,
+      )}
       {...props}
     >
       {children}

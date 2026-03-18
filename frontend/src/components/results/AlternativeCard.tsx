@@ -65,13 +65,15 @@ function StrengthDots({ strength }: { strength: Alternative['recommendation_stre
                 ? 'bg-success-500'
                 : strength === 'moderate'
                   ? 'bg-warning-500'
-                  : 'bg-neutral-400'
-              : 'bg-neutral-200',
+                  : 'bg-neutral-400 dark:bg-slate-500'
+              : 'bg-neutral-200 dark:bg-slate-700',
           )}
           aria-hidden="true"
         />
       ))}
-      <span className="ml-1.5 text-xs text-neutral-500 capitalize">{strength}</span>
+      <span className="ml-1.5 text-xs text-neutral-500 dark:text-slate-400 capitalize">
+        {strength}
+      </span>
     </div>
   );
 }
@@ -90,12 +92,19 @@ export function AlternativeCard({ alternative, onSearch }: AlternativeCardProps)
 
   return (
     <article
-      className="bg-white border border-neutral-200 rounded-card shadow-card p-4 flex flex-col gap-3 transition-shadow duration-200 hover:shadow-card-hover"
+      className={clsx(
+        'bg-white dark:bg-dark-surface',
+        'border border-primary-100 dark:border-dark-border',
+        'rounded-card shadow-card dark:shadow-card-dark',
+        'p-4 flex flex-col gap-3',
+        'transition-shadow duration-200',
+        'hover:shadow-card-hover dark:hover:shadow-card-dark-hover',
+      )}
       aria-label={`Alternative: ${alternative.product_name}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-neutral-900 text-sm leading-tight flex-1 min-w-0">
+        <h3 className="font-semibold text-neutral-900 dark:text-slate-100 text-sm leading-tight flex-1 min-w-0">
           {alternative.product_name}
         </h3>
         <Badge variant={config.variant} className="flex-shrink-0 flex items-center gap-1">
@@ -105,7 +114,7 @@ export function AlternativeCard({ alternative, onSearch }: AlternativeCardProps)
       </div>
 
       {/* Summary */}
-      <p className="text-xs text-neutral-600 leading-relaxed">
+      <p className="text-xs text-neutral-600 dark:text-slate-400 leading-relaxed">
         {alternative.comparison_summary}
       </p>
 
@@ -115,13 +124,26 @@ export function AlternativeCard({ alternative, onSearch }: AlternativeCardProps)
           {alternative.key_differences.slice(0, 4).map((diff) => (
             <div
               key={diff.attribute}
-              className="inline-flex items-baseline gap-1 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs"
+              className={clsx(
+                'inline-flex items-baseline gap-1 rounded px-2 py-1 text-xs',
+                'bg-primary-50 dark:bg-primary-900/30',
+                'border border-primary-100 dark:border-primary-900/60',
+              )}
               title={`${diff.attribute}: ${diff.target} vs ${diff.alternative}`}
             >
-              <span className="font-medium text-neutral-600">{diff.attribute}:</span>
-              <span className="text-neutral-500 line-through">{diff.target}</span>
-              <ArrowRight className="h-2.5 w-2.5 text-neutral-400 flex-shrink-0" aria-hidden="true" />
-              <span className="text-primary-700 font-medium">{diff.alternative}</span>
+              <span className="font-medium text-neutral-600 dark:text-slate-400">
+                {diff.attribute}:
+              </span>
+              <span className="text-neutral-500 dark:text-slate-500 line-through">
+                {diff.target}
+              </span>
+              <ArrowRight
+                className="h-2.5 w-2.5 text-neutral-400 dark:text-slate-500 flex-shrink-0"
+                aria-hidden="true"
+              />
+              <span className="text-primary-700 dark:text-primary-300 font-medium">
+                {diff.alternative}
+              </span>
             </div>
           ))}
         </div>
@@ -131,7 +153,7 @@ export function AlternativeCard({ alternative, onSearch }: AlternativeCardProps)
       <div className="flex items-center justify-between gap-2 pt-1 mt-auto">
         <div className="flex flex-col gap-1">
           {alternative.price_range && (
-            <span className="font-mono text-sm font-semibold text-neutral-800 tabular-nums">
+            <span className="font-mono text-sm font-semibold text-neutral-800 dark:text-slate-200 tabular-nums">
               From {formatPrice(alternative.price_range.min)}
             </span>
           )}

@@ -22,6 +22,16 @@ export const apiClient = axios.create({
   },
 });
 
+// Request interceptor — attach Bearer token from authStore when present
+apiClient.interceptors.request.use((config) => {
+  // Import lazily to avoid circular dependency at module init time
+  const token = localStorage.getItem('shopcompare_token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Response interceptor — normalise error shape
 apiClient.interceptors.response.use(
   (response) => response,
@@ -36,6 +46,82 @@ apiClient.interceptors.response.use(
     return Promise.reject(new Error(message));
   },
 );
+
+// ─────────────────────────────────────────────
+// Auth API
+// ─────────────────────────────────────────────
+
+export interface AuthStatusResponse {
+  admin_exists: boolean;
+}
+
+export interface AuthTokenResponse {
+  access_token: string;
+}
+
+export interface SettingEntry {
+  key: string;
+  masked_value: string;
+  is_set: boolean;
+}
+
+export interface UpdateSettingsResponse {
+  updated: string[];
+}
+
+export const authApi = {
+  /**
+   * Check whether an admin account has been created yet.
+   */
+  getStatus: async (): Promise<AuthStatusResponse> => {
+    const { data } = await apiClient.get<AuthStatusResponse>('/auth/status');
+    return data;
+  },
+
+  /**
+   * Create the first admin account (setup flow).
+   */
+  setup: async (username: string, password: string): Promise<AuthTokenResponse> => {
+    const { data } = await apiClient.post<AuthTokenResponse>('/auth/setup', {
+      username,
+      password,
+    });
+    return data;
+  },
+
+  /**
+   * Authenticate with username and password.
+   */
+  login: async (username: string, password: string): Promise<AuthTokenResponse> => {
+    const { data } = await apiClient.post<AuthTokenResponse>('/auth/login', {
+      username,
+      password,
+    });
+    return data;
+  },
+};
+
+// ─────────────────────────────────────────────
+// Settings API
+// ─────────────────────────────────────────────
+
+export const settingsApi = {
+  /**
+   * Retrieve current API key settings (masked values).
+   */
+  getSettings: async (): Promise<SettingEntry[]> => {
+    const { data } = await apiClient.get<SettingEntry[]>('/settings');
+    return data;
+  },
+
+  /**
+   * Update one or more API key settings.
+   */
+  updateSettings: async (updates: Record<string, string>): Promise<UpdateSettingsResponse> => {
+    const { data } = await apiClient.put<UpdateSettingsResponse>('/settings', updates);
+    return data;
+  },
+};
 
 // ─────────────────────────────────────────────
 // Search API

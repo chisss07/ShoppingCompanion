@@ -38,29 +38,41 @@ class SourceManager:
         settings: Application settings instance.
     """
 
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Settings, key_overrides: dict[str, str] | None = None) -> None:
         self.adapters: list[BaseSourceAdapter] = []
-        self._init_adapters(settings)
+        self._init_adapters(settings, key_overrides or {})
 
-    def _init_adapters(self, settings: Settings) -> None:
-        """Instantiate adapters for every configured API key."""
+    def _init_adapters(self, settings: Settings, key_overrides: dict[str, str]) -> None:
+        """
+        Instantiate adapters for every configured API key.
+
+        key_overrides values (from the DB settings table) take precedence over
+        environment variables so that changes made via the UI Settings page are
+        applied immediately without restarting the container.
+        """
+        def _key(name: str) -> str:
+            return key_overrides.get(name) or getattr(settings, name, "") or ""
+
         # Lazy imports avoid loading unused adapter modules
-        if settings.BESTBUY_API_KEY:
+        bestbuy_key = _key("BESTBUY_API_KEY")
+        if bestbuy_key:
             from app.sources.bestbuy import BestBuySourceAdapter
-            self.adapters.append(BestBuySourceAdapter(settings.BESTBUY_API_KEY))
+            self.adapters.append(BestBuySourceAdapter(bestbuy_key))
             logger.info("source_adapter_enabled", adapter="BestBuy")
 
-        if settings.SERPAPI_KEY:
+        serpapi_key = _key("SERPAPI_KEY")
+        if serpapi_key:
             from app.sources.serpapi_amazon import AmazonAdapter
             from app.sources.serpapi_google import GoogleShoppingAdapter
-            self.adapters.append(GoogleShoppingAdapter(settings.SERPAPI_KEY))
-            self.adapters.append(AmazonAdapter(settings.SERPAPI_KEY))
+            self.adapters.append(GoogleShoppingAdapter(serpapi_key))
+            self.adapters.append(AmazonAdapter(serpapi_key))
             logger.info("source_adapter_enabled", adapter="GoogleShopping")
             logger.info("source_adapter_enabled", adapter="Amazon")
 
-        if settings.EBAY_OAUTH_TOKEN:
+        ebay_token = _key("EBAY_OAUTH_TOKEN")
+        if ebay_token:
             from app.sources.ebay import EbaySourceAdapter
-            self.adapters.append(EbaySourceAdapter(settings.EBAY_OAUTH_TOKEN))
+            self.adapters.append(EbaySourceAdapter(ebay_token))
             logger.info("source_adapter_enabled", adapter="eBay")
 
         # Mock adapter is only used as a fallback when no real sources are configured.

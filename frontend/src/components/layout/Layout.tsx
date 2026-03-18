@@ -9,7 +9,7 @@ import { Sidebar } from './Sidebar';
 
 export default function Layout() {
   return (
-    <div className="flex h-screen overflow-hidden bg-neutral-100">
+    <div className="flex h-screen overflow-hidden bg-[#f0f4ff] dark:bg-[#060d1f]">
       {/* Sidebar — hidden on mobile, visible md+ */}
       <div className="hidden md:flex">
         <Sidebar />
