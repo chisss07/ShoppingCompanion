@@ -51,9 +51,12 @@ class SourceManager:
             logger.info("source_adapter_enabled", adapter="BestBuy")
 
         if settings.SERPAPI_KEY:
+            from app.sources.serpapi_amazon import AmazonAdapter
             from app.sources.serpapi_google import GoogleShoppingAdapter
             self.adapters.append(GoogleShoppingAdapter(settings.SERPAPI_KEY))
+            self.adapters.append(AmazonAdapter(settings.SERPAPI_KEY))
             logger.info("source_adapter_enabled", adapter="GoogleShopping")
+            logger.info("source_adapter_enabled", adapter="Amazon")
 
         if settings.EBAY_OAUTH_TOKEN:
             from app.sources.ebay import EbaySourceAdapter
