@@ -41,8 +41,8 @@ export function Logo({
             textClassName ?? 'text-base',
           )}
         >
-          <span className="text-white">Shop</span>
-          <span className="text-blue-300">Compare</span>
+          <span className="text-gray-900 dark:text-white">Shop</span>
+          <span className="text-blue-600 dark:text-blue-300">Compare</span>
         </span>
       )}
     </span>
