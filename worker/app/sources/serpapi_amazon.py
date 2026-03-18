@@ -32,9 +32,11 @@ def _parse_price(price_str: str) -> float | None:
         return None
 
 
-def _parse_shipping(delivery: str | None) -> float | None:
+def _parse_shipping(delivery: str | list | None) -> float | None:
     """
-    Convert Amazon's delivery string to a shipping cost float.
+    Convert Amazon's delivery field to a shipping cost float.
+
+    SerpAPI may return delivery as a string or a list of strings.
 
     'FREE delivery' or 'FREE Returns' → 0.0
     '$5.99 delivery' → 5.99
@@ -42,6 +44,9 @@ def _parse_shipping(delivery: str | None) -> float | None:
     """
     if not delivery:
         return None
+    # SerpAPI Amazon returns delivery as a list; join into one string to search
+    if isinstance(delivery, list):
+        delivery = " ".join(str(d) for d in delivery)
     lower = delivery.lower()
     if "free" in lower:
         return 0.0
@@ -66,7 +71,7 @@ class AmazonAdapter(BaseSourceAdapter):
     """
 
     name = "Amazon"
-    timeout = 12.0  # Amazon pages can be slower than Google Shopping
+    timeout = 20.0  # SerpAPI can be slow; give it enough headroom
 
     def __init__(self, api_key: str) -> None:
         self._api_key = api_key

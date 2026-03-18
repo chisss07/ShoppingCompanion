@@ -71,6 +71,7 @@ class GoogleShoppingAdapter(BaseSourceAdapter):
     """
 
     name = "GoogleShopping"
+    timeout = 20.0  # SerpAPI can be slow; 8s default is too tight
 
     def __init__(self, api_key: str) -> None:
         self._api_key = api_key
