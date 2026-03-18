@@ -32,7 +32,7 @@ anthropic==0.40.0
 
 # Auth
 python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
+bcrypt==4.2.1
 
 # File uploads / form data
 python-multipart==0.0.18

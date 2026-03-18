@@ -3,19 +3,24 @@ Security utilities: password hashing, JWT issuance/validation, and the
 FastAPI dependency that resolves the currently authenticated admin user.
 
 Dependencies:
-    passlib[bcrypt]  — password hashing
-    python-jose      — JWT encoding / decoding
+    bcrypt       — password hashing (used directly, not via passlib)
+    python-jose  — JWT encoding / decoding
+
+Note: passlib 1.7.x is incompatible with bcrypt >= 4.x (the __about__
+attribute was removed). We call bcrypt directly and pre-hash passwords
+with SHA-256 so we stay well under bcrypt's 72-byte input limit.
 """
 
 from __future__ import annotations
 
+import hashlib
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,22 +34,31 @@ settings = get_settings()
 # Password hashing
 # ---------------------------------------------------------------------------
 
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 _ACCESS_TOKEN_EXPIRE_DAYS = 7
 _ALGORITHM = "HS256"
 
 _http_bearer = HTTPBearer()
 
 
+def _prepare(password: str) -> bytes:
+    """
+    SHA-256 pre-hash the password before passing to bcrypt.
+
+    bcrypt silently truncates inputs longer than 72 bytes, making long
+    passwords equivalent to their first 72 bytes. SHA-256 produces a
+    fixed 64-character hex string that is always within the limit.
+    """
+    return hashlib.sha256(password.encode("utf-8")).hexdigest().encode("utf-8")
+
+
 def hash_password(password: str) -> str:
     """Return the bcrypt hash of *password*."""
-    return _pwd_context.hash(password)
+    return bcrypt.hashpw(_prepare(password), bcrypt.gensalt(rounds=12)).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """Return True if *plain* matches the stored *hashed* value."""
-    return _pwd_context.verify(plain, hashed)
+    return bcrypt.checkpw(_prepare(plain), hashed.encode("utf-8"))
 
 
 # ---------------------------------------------------------------------------
