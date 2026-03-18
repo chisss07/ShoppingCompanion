@@ -126,7 +126,6 @@ class AmazonAdapter(BaseSourceAdapter):
             "engine": "amazon",
             "k": keyword,
             "api_key": self._api_key,
-            "amazon_domain": "amazon.com",
         }
 
         response = await client.get(_SERPAPI_URL, params=params)

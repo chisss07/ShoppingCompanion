@@ -114,15 +114,14 @@ class SourceManager:
             for adapter in self.adapters
         ]
 
-        per_adapter_results: list[list[RawProductListing]] = await asyncio.gather(
-            *tasks, return_exceptions=False
-        )
+        per_adapter_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        all_listings: list[RawProductListing] = [
-            listing
-            for adapter_listings in per_adapter_results
-            for listing in adapter_listings
-        ]
+        all_listings: list[RawProductListing] = []
+        for adapter_result in per_adapter_results:
+            if isinstance(adapter_result, Exception):
+                logger.error("adapter_task_unhandled_exception", error=str(adapter_result))
+            else:
+                all_listings.extend(adapter_result)
 
         logger.info(
             "source_manager_search_complete",
@@ -179,7 +178,14 @@ class SourceManager:
                 exc_info=True,
             )
 
-        await on_source_complete(adapter.name, results, error)
+        try:
+            await on_source_complete(adapter.name, results, error)
+        except Exception as cb_exc:
+            logger.error(
+                "adapter_callback_error",
+                adapter=adapter.name,
+                error=str(cb_exc),
+            )
         return results
 
     async def health_check_all(self) -> dict[str, bool]:
