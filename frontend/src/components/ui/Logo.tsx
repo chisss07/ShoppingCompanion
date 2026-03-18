@@ -31,7 +31,7 @@ export function Logo({
         alt="ShopCompare"
         height={size}
         style={{ height: size, width: 'auto' }}
-        className="flex-shrink-0 object-contain drop-shadow-sm"
+        className="flex-shrink-0 object-contain drop-shadow-sm dark:brightness-150"
       />
 
       {!iconOnly && (

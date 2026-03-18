@@ -151,14 +151,14 @@ export function Sidebar({ className }: SidebarProps) {
     <aside
       className={clsx(
         'flex flex-col h-full',
-        'bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800',
+        'bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700',
         'w-[280px] flex-shrink-0',
         className,
       )}
       aria-label="Sidebar navigation"
     >
       {/* Brand */}
-      <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-800">
+      <div className="px-4 py-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center justify-between">
           <NavLink
             to="/"
@@ -259,7 +259,7 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
 
       {/* Footer: view all + settings */}
-      <div className="border-t border-gray-200 dark:border-gray-800">
+      <div className="border-t border-gray-200 dark:border-slate-700">
         {history.length > 10 && (
           <div className="px-4 py-2 border-b border-gray-200/50 dark:border-gray-800/50">
             <NavLink
